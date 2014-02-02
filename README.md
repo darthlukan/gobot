@@ -42,10 +42,9 @@ GoBot
 ## TODO
 
 - 1. Add commands that actually do something useful
-- 2. Parse URLs pasted in channels to verify that they are legit.
-- 3. Google Search
-- 4. Logging
-- 5. Tests would be nice >.>
+- 2. Google Search
+- 3. Logging
+- 4. Tests would be nice >.>
 
 ## License
 
