@@ -33,7 +33,7 @@ import (
 var (
 	channel          = "#tinfoilhats"
 	server           = "irc.freenode.net:6667"
-	botNick, botUser = "Snuffles_test", "Snuffles_test"
+	botNick, botUser = "Snuffles", "Snuffles"
 )
 
 // ParseCmds takes PRIVMSG strings containing a preceding bang "!"
