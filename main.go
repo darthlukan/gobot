@@ -24,17 +24,16 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/thoj/go-ircevent"
+	"os"
 	"strings"
 )
 
-// TODO: These should really be in a config file...
-var (
-	channel          = "#tinfoilhats"
-	server           = "irc.freenode.net:6667"
-	botNick, botUser = "Snuffles", "Snuffles"
-)
+type Config struct {
+	Server, Channel, BotUser, BotNick string
+}
 
 // ParseCmds takes PRIVMSG strings containing a preceding bang "!"
 // and attempts to turn them into an ACTION that makes sense.
@@ -54,14 +53,14 @@ func ParseCmds(cmdMsg string) string {
 
 // AddCallbacks is a single function that does what it says.
 // It's merely a way of decluttering the main function.
-func AddCallbacks(conn *irc.Connection) {
+func AddCallbacks(conn *irc.Connection, config *Config) {
 	conn.AddCallback("001", func(e *irc.Event) {
-		conn.Join(channel)
+		conn.Join(config.Channel)
 	})
 
 	conn.AddCallback("JOIN", func(e *irc.Event) {
-		if e.Nick == botNick {
-			conn.Privmsg(channel, "Hello everybody, I'm a bot")
+		if e.Nick == config.BotNick {
+			conn.Privmsg(config.Channel, "Hello everybody, I'm a bot")
 		}
 	})
 
@@ -71,7 +70,7 @@ func AddCallbacks(conn *irc.Connection) {
 		if strings.Contains(e.Message, "!") && strings.Index(e.Message, "!") == 0 {
 			// This is a command, parse it.
 			response = ParseCmds(e.Message)
-			conn.Privmsg(channel, response)
+			conn.Privmsg(config.Channel, response)
 		}
 	})
 }
@@ -79,11 +78,11 @@ func AddCallbacks(conn *irc.Connection) {
 // Connect tries up to three times to get a connection to the server
 // and channel, hopefully with a nil err value at some point.
 // Returns error
-func Connect(conn *irc.Connection) error {
+func Connect(conn *irc.Connection, config *Config) error {
 	var err error
 
 	for attempt := 1; attempt <= 3; attempt++ {
-		if err = conn.Connect(server); err != nil {
+		if err = conn.Connect(config.Server); err != nil {
 			fmt.Println("Connection attempt %v failed, trying again...", attempt)
 			continue
 		} else {
@@ -94,8 +93,21 @@ func Connect(conn *irc.Connection) error {
 }
 
 func main() {
-	conn := irc.IRC(botNick, botUser)
-	err := Connect(conn)
+
+	// Read the config file and populate our Config struct.
+	file, err := os.Open("config.json")
+
+	if err != nil {
+		fmt.Println("Couldn't read config file, dying...")
+		panic(err)
+	}
+
+	decoder := json.NewDecoder(file)
+	config := &Config{}
+	decoder.Decode(&config)
+
+	conn := irc.IRC(config.BotNick, config.BotUser)
+	err := Connect(conn, config)
 
 	if err != nil {
 		fmt.Println("Failed to connect.")
@@ -103,6 +115,6 @@ func main() {
 		panic(err)
 	}
 
-	AddCallbacks(conn)
+	AddCallbacks(conn, config)
 	conn.Loop()
 }

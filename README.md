@@ -10,11 +10,18 @@ GoBot
 ```
     $ go get github.com/darthlukan/gobot
 ```
+> Or:
+
+```
+    $ mkdir -p $GOPATH/src/github.com/darthlukan
+    $ cd $GOPATH/src/github.com/darthlukan
+    $ git clone git@github.com:darthlukan/gobot.git
+    $ cd gobot
+```
 
 ## Usage
 
-> Please edit $GOPATH/src/github.com/darthlukan/gobot/main.go and change the channel,
-> server, botNick, and botUser variables to your preference before running the bot!
+> Edit the config.json file located in $GOPATH/src/github.com/darthlukan/gobot to your preferences.
 
 > After those variables have been edited, you can run:
 ```
