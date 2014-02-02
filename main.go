@@ -54,17 +54,16 @@ func ParseCmds(cmdMsg string) string {
 	return msg
 }
 
+// UrlTitle attempts to extract the title of the page that a
+// pasted URL points to.
+// Returns a string message with the title and URL on success, or a string
+// with an error message on failure.
 func UrlTitle(msg string) string {
 	var (
 		newMsg, url, title, word string
 	)
 
-	regex, err := regexp.Compile(`<title[^>]*>([^<]+)<\/title>`)
-
-	if err != nil {
-		newMsg = fmt.Sprintf("regex compile failed... dummy...")
-		return newMsg
-	}
+	regex, _ := regexp.Compile(`<title[^>]*>([^<]+)<\/title>`)
 
 	msgArray := strings.Split(msg, " ")
 
@@ -90,6 +89,7 @@ func UrlTitle(msg string) string {
 		newMsg = fmt.Sprintf("Could not read response Body of %v ...", word)
 		return newMsg
 	}
+
 	body := string(rawBody)
 	title = regex.FindString(body)
 	newMsg = fmt.Sprintf("[ %v ]->( %v )", title, url)
@@ -121,7 +121,10 @@ func AddCallbacks(conn *irc.Connection, config *Config) {
 		if strings.Contains(e.Message, "http") || strings.Contains(e.Message, "www") {
 			response = UrlTitle(e.Message)
 		}
-		conn.Privmsg(config.Channel, response)
+
+		if len(response) > 0 {
+			conn.Privmsg(config.Channel, response)
+		}
 	})
 }
 
