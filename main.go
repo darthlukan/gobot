@@ -107,7 +107,7 @@ func main() {
 	decoder.Decode(&config)
 
 	conn := irc.IRC(config.BotNick, config.BotUser)
-	err := Connect(conn, config)
+	err = Connect(conn, config)
 
 	if err != nil {
 		fmt.Println("Failed to connect.")
