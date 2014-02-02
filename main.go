@@ -27,7 +27,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/thoj/go-ircevent"
+	"io/ioutil"
+	"net/http"
 	"os"
+	"regexp"
 	"strings"
 )
 
@@ -51,6 +54,49 @@ func ParseCmds(cmdMsg string) string {
 	return msg
 }
 
+func UrlTitle(msg string) string {
+	var (
+		newMsg, url, title, word string
+	)
+
+	regex, err := regexp.Compile(`<title[^>]*>([^<]+)<\/title>`)
+
+	if err != nil {
+		newMsg = fmt.Sprintf("regex compile failed... dummy...")
+		return newMsg
+	}
+
+	msgArray := strings.Split(msg, " ")
+
+	for _, word = range msgArray {
+		if strings.Contains(word, "http") || strings.Contains(word, "www") {
+			url = word
+			break
+		}
+	}
+
+	resp, err := http.Get(word)
+
+	if err != nil {
+		newMsg = fmt.Sprintf("Could not resolve URL %v, beware...\n", word)
+		return newMsg
+	}
+
+	defer resp.Body.Close()
+
+	rawBody, err := ioutil.ReadAll(resp.Body)
+
+	if err != nil {
+		newMsg = fmt.Sprintf("Could not read response Body of %v ...", word)
+		return newMsg
+	}
+	body := string(rawBody)
+	title = regex.FindString(body)
+	newMsg = fmt.Sprintf("[ %v ]->( %v )", title, url)
+
+	return newMsg
+}
+
 // AddCallbacks is a single function that does what it says.
 // It's merely a way of decluttering the main function.
 func AddCallbacks(conn *irc.Connection, config *Config) {
@@ -70,8 +116,12 @@ func AddCallbacks(conn *irc.Connection, config *Config) {
 		if strings.Contains(e.Message, "!") && strings.Index(e.Message, "!") == 0 {
 			// This is a command, parse it.
 			response = ParseCmds(e.Message)
-			conn.Privmsg(config.Channel, response)
 		}
+
+		if strings.Contains(e.Message, "http") || strings.Contains(e.Message, "www") {
+			response = UrlTitle(e.Message)
+		}
+		conn.Privmsg(config.Channel, response)
 	})
 }
 
