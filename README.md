@@ -41,13 +41,11 @@ GoBot
 
 ## TODO
 
-- 1. Reorganize the code
-- 2. Use a config file
-- 3. Add commands that actually do something useful
-- 4. Parse URLs pasted in channels to verify that they are legit.
-- 5. Google Search
-- 6. Logging
-- 7. Tests would be nice >.>
+- 1. Add commands that actually do something useful
+- 2. Parse URLs pasted in channels to verify that they are legit.
+- 3. Google Search
+- 4. Logging
+- 5. Tests would be nice >.>
 
 ## License
 
