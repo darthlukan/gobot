@@ -42,15 +42,29 @@ type Config struct {
 // and attempts to turn them into an ACTION that makes sense.
 // Returns a msg string.
 func ParseCmds(cmdMsg string) string {
-	cmdArray := strings.SplitAfterN(cmdMsg, "!", 2)
-	msgArray := strings.SplitN(cmdArray[1], " ", 2)
-	cmd := fmt.Sprintf("%vs", msgArray[0])
+	var (
+		msg      string
+		msgArray []string
+		cmdArray []string
+	)
 
-	// This should give us something like:
-	//     "Snuffles slaps $USER, FOR SCIENCE!"
-	// If given the command:
-	//     "!slap $USER"
-	msg := fmt.Sprintf("\x01"+"ACTION %v %v, FOR SCIENCE!\x01", cmd, msgArray[1])
+	cmdArray = strings.SplitAfterN(cmdMsg, "!", 2)
+
+	if len(cmdArray) > 0 {
+		msgArray = strings.SplitN(cmdArray[1], " ", 2)
+	}
+
+	if len(msgArray) > 1 {
+		cmd := fmt.Sprintf("%vs", msgArray[0])
+
+		// This should give us something like:
+		//     "Snuffles slaps $USER, FOR SCIENCE!"
+		// If given the command:
+		//     "!slap $USER"
+		msg = fmt.Sprintf("\x01"+"ACTION %v %v, FOR SCIENCE!\x01", cmd, msgArray[1])
+	} else {
+		msg = "I did not understand your command. Try '!slap Setsuna-Xero really hard'"
+	}
 	return msg
 }
 
@@ -95,6 +109,12 @@ func UrlTitle(msg string) string {
 	newMsg = fmt.Sprintf("[ %v ]->( %v )", title, url)
 
 	return newMsg
+}
+
+func QueryGoogle(query string) string {
+	var results string
+	// TODO: Logic!
+	return results
 }
 
 // AddCallbacks is a single function that does what it says.
