@@ -132,14 +132,15 @@ func AddCallbacks(conn *irc.Connection, config *Config) {
 
 	conn.AddCallback("PRIVMSG", func(e *irc.Event) {
 		var response string
+		message := e.Message()
 
-		if strings.Contains(e.Message, "!") && strings.Index(e.Message, "!") == 0 {
+		if strings.Contains(message, "!") && strings.Index(message, "!") == 0 {
 			// This is a command, parse it.
-			response = ParseCmds(e.Message)
+			response = ParseCmds(message)
 		}
 
-		if strings.Contains(e.Message, "http") || strings.Contains(e.Message, "www") {
-			response = UrlTitle(e.Message)
+		if strings.Contains(message, "http") || strings.Contains(message, "www") {
+			response = UrlTitle(message)
 		}
 
 		if len(response) > 0 {
