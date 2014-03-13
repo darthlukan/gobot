@@ -28,6 +28,7 @@ import (
 	"fmt"
 	"github.com/thoj/go-ircevent"
 	"io/ioutil"
+	"math/rand"
 	"net/http"
 	"os"
 	"regexp"
@@ -35,13 +36,29 @@ import (
 )
 
 type Config struct {
-	Server, Channel, BotUser, BotNick string
+	Server, Channel, BotUser, BotNick, WeatherKey string
+}
+
+var phrases = []string{
+	"FOR SCIENCE!",
+	"because... reasons.",
+	"it's super effective!",
+	"because... why not?",
+	"was it good for you?",
+	"given the alternative, yep, worth it!",
+	"don't ask...",
+	"then makes a sandwich.",
+	"oh noes!",
+}
+
+func RandomString() string {
+	return phrases[rand.Intn(len(phrases))]
 }
 
 // ParseCmds takes PRIVMSG strings containing a preceding bang "!"
 // and attempts to turn them into an ACTION that makes sense.
 // Returns a msg string.
-func ParseCmds(cmdMsg string) string {
+func ParseCmds(cmdMsg string, config *Config) string {
 	var (
 		msg      string
 		msgArray []string
@@ -57,11 +74,19 @@ func ParseCmds(cmdMsg string) string {
 	if len(msgArray) > 1 {
 		cmd := fmt.Sprintf("%vs", msgArray[0])
 
-		// This should give us something like:
-		//     "Snuffles slaps $USER, FOR SCIENCE!"
-		// If given the command:
-		//     "!slap $USER"
-		msg = fmt.Sprintf("\x01"+"ACTION %v %v, FOR SCIENCE!\x01", cmd, msgArray[1])
+		if strings.Contains(cmd, "weather") {
+			// weatherArray := strings.Split(msgArray[1], " ", 2)
+			// query := strings.Join(weatherArray[0], "")
+			// msg = QueryWeather(query, config)
+			msg = "Look outside, this feature isn't implemented just yet."
+		} else {
+			// This should give us something like:
+			//     "Snuffles slaps $USER, FOR SCIENCE!"
+			// If given the command:
+			//     "!slap $USER"
+			randPhrase := RandomString()
+			msg = fmt.Sprintf("\x01"+"ACTION %v %v, %v\x01", cmd, msgArray[1], randPhrase)
+		}
 	} else {
 		msg = "I did not understand your command. Try '!slap Setsuna-Xero really hard'"
 	}
@@ -111,6 +136,24 @@ func UrlTitle(msg string) string {
 	return newMsg
 }
 
+//func QueryWeather(query string, config *Config) string {
+//	var beginUrl string = "http://api.worldweatheronline.com/free/v1/weather.ashx?q="
+//	var endUrl string = "&format=json&num_of_days=1&date=today&includelocation=yes&show_comments=no&key="
+
+//	city := query
+//	url := fmt.Sprintf("%v%v%v%v", beginUrl, city, endUrl, config.WeatherKey)
+//	client := http.Client()
+//	response, err := client.Get(url)
+
+//	if err != nil {
+//		return fmt.Sprintf("Caught error: %v", err.Error())
+//	}
+//	weatherJson := json.Decoder(response.Body)
+//	weather := fmt.Sprintf("Weather for %v: %vC", weatherJson)
+//	return weather
+
+//}
+
 func QueryGoogle(query string) string {
 	var results string
 	// TODO: Logic!
@@ -136,7 +179,7 @@ func AddCallbacks(conn *irc.Connection, config *Config) {
 
 		if strings.Contains(message, "!") && strings.Index(message, "!") == 0 {
 			// This is a command, parse it.
-			response = ParseCmds(message)
+			response = ParseCmds(message, config)
 		}
 
 		if strings.Contains(message, "http") || strings.Contains(message, "www") {
@@ -168,6 +211,7 @@ func Connect(conn *irc.Connection, config *Config) error {
 
 func main() {
 
+	rand.Seed(64)
 	// Read the config file and populate our Config struct.
 	file, err := os.Open("config.json")
 
