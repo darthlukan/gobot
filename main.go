@@ -102,7 +102,7 @@ func UrlTitle(msg string) string {
 		newMsg, url, title, word string
 	)
 
-	regex, _ := regexp.Compile(`<title[^>]*>([^<]+)<\/title>`)
+	regex, _ := regexp.Compile(`<title>(.+?)<\/title>`)
 
 	msgArray := strings.Split(msg, " ")
 
@@ -130,7 +130,7 @@ func UrlTitle(msg string) string {
 	}
 
 	body := string(rawBody)
-	title = regex.FindString(body)
+	title = regex.FindStringSubmatch(body)[1]
 	newMsg = fmt.Sprintf("[ %v ]->( %v )", title, url)
 
 	return newMsg
