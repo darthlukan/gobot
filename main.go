@@ -26,6 +26,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/darthlukan/cakeday"
 	"github.com/thoj/go-ircevent"
 	"io/ioutil"
 	"math/rand"
@@ -79,6 +80,15 @@ func ParseCmds(cmdMsg string, config *Config) string {
 			// query := strings.Join(weatherArray[0], "")
 			// msg = QueryWeather(query, config)
 			msg = "Look outside, this feature isn't implemented just yet."
+		} else if strings.Contains(cmd, "cakeday") {
+			// !cakeday $USER
+			responseString, err := cakeday.Get(msgArray[1])
+			if err != nil {
+				msg = fmt.Sprintf("I caught an error: %v\n", err)
+			}
+
+			// >> Reddit Cake Day for $USER is: $CAKEDAY
+			msg = fmt.Sprintf("%v\n", responseString)
 		} else {
 			// This should give us something like:
 			//     "Snuffles slaps $USER, FOR SCIENCE!"
