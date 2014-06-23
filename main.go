@@ -90,11 +90,11 @@ func ParseCmds(cmdMsg string, config *Config) string {
 			// >> Reddit Cake Day for $USER is: $CAKEDAY
 			msg = fmt.Sprintf("%v\n", responseString)
 		} else if strings.Contains(cmd, "help") {
-			msgp1 = "Available commands: !help, !weather (NYI), !cakeday, !VERB\n"
-			msgp2 = "!help: Display this help message.\n"
-			msgp3 = "!weather <city>: Not yet implemented.\n"
-			msgp4 = "!cakeday <username>: Get the Reddit Cake Day for the requested user.\n"
-			msgp5 = "!VERB <msg>: Perform the selected verb in <msg> context. Example: !slap setkeh\n"
+			msgp1 := "Available commands: !help, !weather (NYI), !cakeday, !VERB\n"
+			msgp2 := "!help: Display this help message.\n"
+			msgp3 := "!weather <city>: Not yet implemented.\n"
+			msgp4 := "!cakeday <username>: Get the Reddit Cake Day for the requested user.\n"
+			msgp5 := "!VERB <msg>: Perform the selected verb in <msg> context. Example: !slap setkeh\n"
 			msg = fmt.Sprintf("%s %s %s %s %s", msgp1, msgp2, msgp3, msgp4, msgp5)
 
 		} else {
