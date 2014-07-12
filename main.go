@@ -76,38 +76,62 @@ func ParseCmds(cmdMsg string, config *Config) string {
 		cmd := fmt.Sprintf("%vs", msgArray[0])
 
 		if strings.Contains(cmd, "weather") {
-			// weatherArray := strings.Split(msgArray[1], " ", 2)
-			// query := strings.Join(weatherArray[0], "")
-			// msg = QueryWeather(query, config)
-			msg = "Look outside, this feature isn't implemented just yet."
+			msg = WeatherCmd()
 		} else if strings.Contains(cmd, "cakeday") {
-			// !cakeday $USER
-			responseString, err := cakeday.Get(msgArray[1])
-			if err != nil {
-				msg = fmt.Sprintf("I caught an error: %v\n", err)
-			}
-
-			// >> Reddit Cake Day for $USER is: $CAKEDAY
-			msg = fmt.Sprintf("%v\n", responseString)
-		} else if strings.Contains(cmd, "help") {
-			msgp1 := "Available commands: !help, !weather (NYI), !cakeday, !VERB\n"
-			msgp2 := "!help: Display this help message.\n"
-			msgp3 := "!weather <city>: Not yet implemented.\n"
-			msgp4 := "!cakeday <username>: Get the Reddit Cake Day for the requested user.\n"
-			msgp5 := "!VERB <msg>: Perform the selected verb in <msg> context. Example: !slap setkeh\n"
-			msg = fmt.Sprintf("%s %s %s %s %s", msgp1, msgp2, msgp3, msgp4, msgp5)
-
+			msg = CakeDayCmd()
 		} else {
-			// This should give us something like:
-			//     "Snuffles slaps $USER, FOR SCIENCE!"
-			// If given the command:
-			//     "!slap $USER"
-			randPhrase := RandomString()
-			msg = fmt.Sprintf("\x01"+"ACTION %v %v, %v\x01", cmd, msgArray[1], randPhrase)
+			msg = GenericVerbCmd(cmd, msgArray[1])
 		}
 	} else {
-		msg = "I did not understand your command. Try '!slap Setsuna-Xero really hard'"
+		if strings.Contains(msgArray[0], "help") {
+			msg = HelpCmd()
+		} else {
+			msg = "I did not understand your command. Try '!slap Setsuna-Xero really hard'"
+		}
 	}
+	return msg
+}
+
+// Commands
+
+// GenericVerbCmd returns a message string based on the supplied cmd (a verb).
+func GenericVerbCmd(cmd, extra string) string {
+	// This should give us something like:
+	//     "Snuffles slaps $USER, FOR SCIENCE!"
+	// If given the command:
+	//     "!slap $USER"
+	randPhrase := RandomString()
+	msg := fmt.Sprintf("\x01"+"ACTION %v %v, %v\x01", cmd, extra, randPhrase)
+}
+
+// WeatherCmd is NYI
+func WeatherCmd() string {
+	// weatherArray := strings.Split(msgArray[1], " ", 2)
+	// query := strings.Join(weatherArray[0], "")
+	// msg = QueryWeather(query, config)
+	msg := "Look outside, this feature isn't implemented just yet."
+}
+
+// CakeDayCmd returns a string containing the Reddit cakeday of a user
+// upon success, or an error string on failure.
+func CakeDayCmd() string {
+	// !cakeday $USER
+	responseString, err := cakeday.Get(msgArray[1])
+	if err != nil {
+		msg := fmt.Sprintf("I caught an error: %v\n", err)
+	}
+
+	// >> Reddit Cake Day for $USER is: $CAKEDAY
+	msg := fmt.Sprintf("%v\n", responseString)
+}
+
+func HelpCmd() string {
+	msgp1 := "Available commands: !help, !weather (NYI), !cakeday, !VERB\n"
+	msgp2 := "!help: Display this help message.\n"
+	msgp3 := "!weather <city>: Not yet implemented.\n"
+	msgp4 := "!cakeday <username>: Get the Reddit Cake Day for the requested user.\n"
+	msgp5 := "!VERB <msg>: Perform the selected verb in <msg> context. Example: !slap setkeh\n"
+	msg := fmt.Sprintf("%s %s %s %s %s", msgp1, msgp2, msgp3, msgp4, msgp5)
 	return msg
 }
 
@@ -131,10 +155,16 @@ func UrlTitle(msg string) string {
 		}
 	}
 
-	resp, err := http.Get(word)
+	// Band-AID. TODO: Fix this properly.
+	if strings.Contains(url, "imgur") {
+		newMsg = fmt.Sprintf("Cannot resolve Imgur links right now, beware...\n")
+		return newMsg
+	}
+
+	resp, err := http.Get(url)
 
 	if err != nil {
-		newMsg = fmt.Sprintf("Could not resolve URL %v, beware...\n", word)
+		newMsg = fmt.Sprintf("Could not resolve URL %v, beware...\n", url)
 		return newMsg
 	}
 
@@ -143,7 +173,7 @@ func UrlTitle(msg string) string {
 	rawBody, err := ioutil.ReadAll(resp.Body)
 
 	if err != nil {
-		newMsg = fmt.Sprintf("Could not read response Body of %v ...", word)
+		newMsg = fmt.Sprintf("Could not read response Body of %v ...", url)
 		return newMsg
 	}
 
