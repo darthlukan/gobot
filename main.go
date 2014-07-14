@@ -78,7 +78,7 @@ func ParseCmds(cmdMsg string, config *Config) string {
 		if strings.Contains(cmd, "weather") {
 			msg = WeatherCmd()
 		} else if strings.Contains(cmd, "cakeday") {
-			msg = CakeDayCmd()
+			msg = CakeDayCmd(msgArray[1])
 		} else {
 			msg = GenericVerbCmd(cmd, msgArray[1])
 		}
@@ -102,6 +102,7 @@ func GenericVerbCmd(cmd, extra string) string {
 	//     "!slap $USER"
 	randPhrase := RandomString()
 	msg := fmt.Sprintf("\x01"+"ACTION %v %v, %v\x01", cmd, extra, randPhrase)
+	return msg
 }
 
 // WeatherCmd is NYI
@@ -110,19 +111,21 @@ func WeatherCmd() string {
 	// query := strings.Join(weatherArray[0], "")
 	// msg = QueryWeather(query, config)
 	msg := "Look outside, this feature isn't implemented just yet."
+	return msg
 }
 
 // CakeDayCmd returns a string containing the Reddit cakeday of a user
 // upon success, or an error string on failure.
-func CakeDayCmd() string {
+func CakeDayCmd(user string) string {
 	// !cakeday $USER
-	responseString, err := cakeday.Get(msgArray[1])
+	responseString, err := cakeday.Get(user)
 	if err != nil {
 		msg := fmt.Sprintf("I caught an error: %v\n", err)
 	}
 
 	// >> Reddit Cake Day for $USER is: $CAKEDAY
 	msg := fmt.Sprintf("%v\n", responseString)
+	return msg
 }
 
 func HelpCmd() string {
