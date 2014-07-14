@@ -121,6 +121,7 @@ func CakeDayCmd(user string) string {
 	responseString, err := cakeday.Get(user)
 	if err != nil {
 		msg := fmt.Sprintf("I caught an error: %v\n", err)
+		return msg
 	}
 
 	// >> Reddit Cake Day for $USER is: $CAKEDAY
