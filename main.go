@@ -160,8 +160,8 @@ func UrlTitle(msg string) string {
 	}
 
 	// Band-AID. TODO: Fix this properly.
-	if strings.Contains(url, "imgur") {
-		newMsg = fmt.Sprintf("Cannot resolve Imgur links right now, beware...\n")
+	if strings.Contains(url, "imgur") || strings.Contains(url, ".jpg") || strings.Contains(url, ".png") || strings.Contains(url, ".gif") {
+		newMsg = fmt.Sprintf("Cannot resolve Image / Imgur links right now, beware...\n")
 		return newMsg
 	}
 
