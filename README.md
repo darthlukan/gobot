@@ -41,7 +41,9 @@ GoBot
 
 ## Logging
 > Gobot can now Log Channels.
+
 > Set the "LogDir" in config.json
+
 > NOTE: the Directory Must be Writable by the user executing the bot.
 
 ## TODO
