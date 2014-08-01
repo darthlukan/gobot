@@ -39,11 +39,18 @@ GoBot
     >> *$botNick slaps SomeUser really hard, FOR SCIENCE!
 ```
 
+## Logging
+> Gobot can now Log Channels.
+
+> Set the "LogDir" in config.json
+
+> NOTE: the Directory Must be Writable by the user executing the bot.
+
 ## TODO
 
 - 1. Add commands that actually do something useful
 - 2. Google Search
-- 3. Logging
+- 3. ~~~Logging~~~
 - 4. Tests would be nice >.>
 
 ## License

@@ -1,6 +1,7 @@
 {
 	"Server": "irc.freenode.net:6667",
 	"Channel": "#tinfoilhats",
-	"BotUser": "Snuffles",
-	"BotNick": "Snuffles"
+	"BotUser": "Gobot",
+	"BotNick": "Gobot",
+	"LogDir": "/tmp/gobot/"
 }

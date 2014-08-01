@@ -26,8 +26,10 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"time"
 	"github.com/darthlukan/cakeday"
 	"github.com/thoj/go-ircevent"
+	"io"
 	"io/ioutil"
 	"math/rand"
 	"net/http"
@@ -37,7 +39,7 @@ import (
 )
 
 type Config struct {
-	Server, Channel, BotUser, BotNick, WeatherKey string
+	Server, Channel, BotUser, BotNick, WeatherKey, LogDir string
 }
 
 var phrases = []string{
@@ -90,6 +92,46 @@ func ParseCmds(cmdMsg string, config *Config) string {
 		}
 	}
 	return msg
+}
+
+func LogDir(CreateDir string) {
+
+	//Check if the LogDir Exists. And if not Create it.
+	if _, err := os.Stat(CreateDir); os.IsNotExist(err) {
+		fmt.Printf("no such file or directory: %s", CreateDir)
+		os.Mkdir(CreateDir, 0777)
+	} else {
+		fmt.Printf("Its There: %s", CreateDir)
+	}
+}
+
+func LogFile(CreateFile string) {
+
+	//Check if the Log File for the Channel(s) Exists if not create it 
+	if _, err := os.Stat(CreateFile + ".log"); os.IsNotExist(err) {
+		fmt.Printf("Log File " + CreateFile + ".log Doesn't Exist. Creating Log File.")
+		os.Create( CreateFile + ".log")
+		fmt.Printf("Log File " + CreateFile + ".log Created.")
+	} else {
+		fmt.Printf("Log File Exists.")
+	}
+}
+
+// Begin Bot Channel Logging.
+func ChannelLogger(Log string, UserNick string, message string) {
+	STime := time.Now().UTC().Format(time.ANSIC)
+
+	//Open the file for writing With Append Flag to create file persistence
+	f, err := os.OpenFile(Log + ".log", os.O_RDWR|os.O_APPEND, 0666)
+	if err != nil {
+		fmt.Println(err)
+	}
+	//And Write the Logs with timestamps :)
+	n, err := io.WriteString(f, STime + " > " + UserNick + ": " + message + "\n")
+	if err != nil {
+		fmt.Println(n, err)
+	}
+	f.Close()
 }
 
 // Commands
@@ -222,6 +264,8 @@ func AddCallbacks(conn *irc.Connection, config *Config) {
 	conn.AddCallback("JOIN", func(e *irc.Event) {
 		if e.Nick == config.BotNick {
 			conn.Privmsg(config.Channel, "Hello everybody, I'm a bot")
+			LogDir(config.LogDir)
+			LogFile(config.LogDir + e.Arguments[0])
 		}
 	})
 
@@ -240,6 +284,10 @@ func AddCallbacks(conn *irc.Connection, config *Config) {
 
 		if len(response) > 0 {
 			conn.Privmsg(config.Channel, response)
+		}
+
+		if len(message) > 0 {
+			ChannelLogger(config.LogDir + e.Arguments[0], e.Nick, message)
 		}
 	})
 }
