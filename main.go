@@ -271,7 +271,7 @@ func AddCallbacks(conn *irc.Connection, config *Config) {
 
 	conn.AddCallback("PRIVMSG", func(e *irc.Event) {
 		var response string
-		message := e.Message()
+		message := e.Message
 
 		if strings.Contains(message, "!") && strings.Index(message, "!") == 0 {
 			// This is a command, parse it.
