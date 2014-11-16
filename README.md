@@ -7,6 +7,9 @@ GoBot
 > GoBot is my first stab at an IRC bot written in Go.
 
 ## Installation
+
+**Important**: Requires Go>=1.3
+
 ```
     $ go get github.com/darthlukan/gobot
 ```
