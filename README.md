@@ -1,6 +1,6 @@
 GoBot
 ========
-
+[![Build Status](https://drone.io/github.com/darthlukan/gobot/status.png)](https://drone.io/github.com/darthlukan/gobot/latest)
 
 ## Description
 
