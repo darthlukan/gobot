@@ -122,12 +122,12 @@ func ChannelLogger(Log string, UserNick string, message string) {
 	STime := time.Now().UTC().Format(time.ANSIC)
 
 	//Open the file for writing With Append Flag to create file persistence
-	f, err := os.OpenFile(Log + ".log", os.O_RDWR|os.O_APPEND, 0666)
+	f, err := os.OpenFile(Log + ".log", os.O_RDWR|os.O_APPEND|os.O_SYNC, 0666)
 	if err != nil {
 		fmt.Println(err)
 	}
 	//And Write the Logs with timestamps :)
-	n, err := io.WriteString(f, STime + " > " + UserNick + ": " + message + "\n")
+	n, err := io.WriteString(f, STime + " > " + UserNick + message + "\n")
 	if err != nil {
 		fmt.Println(n, err)
 	}
@@ -267,6 +267,16 @@ func AddCallbacks(conn *irc.Connection, config *Config) {
 			LogDir(config.LogDir)
 			LogFile(config.LogDir + e.Arguments[0])
 		}
+		message := " has joined"
+		ChannelLogger(config.LogDir + e.Arguments[0], e.Nick, message)
+	})
+	conn.AddCallback("PART", func(e *irc.Event) {
+		message := " has parted"
+		ChannelLogger(config.LogDir + e.Arguments[0], e.Nick, message)
+	})
+	conn.AddCallback("QUIT", func (e *irc.Event) {
+		message := " has quit"
+		ChannelLogger(config.LogDir + e.Arguments[0], e.Nick, message)
 	})
 
 	conn.AddCallback("PRIVMSG", func(e *irc.Event) {
@@ -287,7 +297,7 @@ func AddCallbacks(conn *irc.Connection, config *Config) {
 		}
 
 		if len(message) > 0 {
-			ChannelLogger(config.LogDir + e.Arguments[0], e.Nick, message)
+			ChannelLogger(config.LogDir + e.Arguments[0], e.Nick + ": ", message)
 		}
 	})
 }
