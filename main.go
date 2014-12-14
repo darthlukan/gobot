@@ -225,7 +225,12 @@ func UrlTitle(msg string) string {
 	}
 
 	body := string(rawBody)
-	title = regex.FindStringSubmatch(body)[1]
+	titleMatch := regex.FindStringSubmatch(body)
+	if len(titleMatch) > 1 {
+		title = titleMatch[1]
+	} else {
+		title = fmt.Sprintf("Title Failure")
+	}
 	newMsg = fmt.Sprintf("[ %v ]->( %v )\n", title, url)
 
 	return newMsg
