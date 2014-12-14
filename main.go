@@ -98,20 +98,20 @@ func LogDir(CreateDir string) {
 
 	//Check if the LogDir Exists. And if not Create it.
 	if _, err := os.Stat(CreateDir); os.IsNotExist(err) {
-		fmt.Printf("no such file or directory: %s", CreateDir)
+		fmt.Printf("No such file or directory: %s\n", CreateDir)
 		os.Mkdir(CreateDir, 0777)
 	} else {
-		fmt.Printf("Its There: %s", CreateDir)
+		fmt.Printf("Its There: %s\n", CreateDir)
 	}
 }
 
 func LogFile(CreateFile string) {
-
+	log := strings.TrimPrefix(CreateFile, "#")
 	//Check if the Log File for the Channel(s) Exists if not create it
-	if _, err := os.Stat(CreateFile + ".log"); os.IsNotExist(err) {
-		fmt.Printf("Log File " + CreateFile + ".log Doesn't Exist. Creating Log File.\n")
-		os.Create(CreateFile + ".log")
-		fmt.Printf("Log File " + CreateFile + ".log Created.\n")
+	if _, err := os.Stat(log + ".log"); os.IsNotExist(err) {
+		fmt.Printf("Log File " + log + ".log Doesn't Exist. Creating Log File.\n")
+		os.Create(log + ".log")
+		fmt.Printf("Log File " + log + ".log Created.\n")
 	} else {
 		fmt.Printf("Log File Exists.\n")
 	}
@@ -153,7 +153,7 @@ func WeatherCmd() string {
 	// weatherArray := strings.Split(msgArray[1], " ", 2)
 	// query := strings.Join(weatherArray[0], "")
 	// msg = QueryWeather(query, config)
-	msg := "Look outside, this feature isn't implemented just yet."
+	msg := "Look outside, this feature isn't implemented just yet.\n"
 	return msg
 }
 
@@ -220,13 +220,13 @@ func UrlTitle(msg string) string {
 	rawBody, err := ioutil.ReadAll(resp.Body)
 
 	if err != nil {
-		newMsg = fmt.Sprintf("Could not read response Body of %v ...", url)
+		newMsg = fmt.Sprintf("Could not read response Body of %v ...\n", url)
 		return newMsg
 	}
 
 	body := string(rawBody)
 	title = regex.FindStringSubmatch(body)[1]
-	newMsg = fmt.Sprintf("[ %v ]->( %v )", title, url)
+	newMsg = fmt.Sprintf("[ %v ]->( %v )\n", title, url)
 
 	return newMsg
 }
