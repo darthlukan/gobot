@@ -191,7 +191,7 @@ func UrlTitle(msg string) string {
 		newMsg, url, title, word string
 	)
 
-	regex, _ := regexp.Compile(`<title>(.+?)<\/title>`)
+	regex, _ := regexp.Compile(`(?i)<title>(.+?)<\/title>`)
 
 	msgArray := strings.Split(msg, " ")
 
@@ -229,9 +229,9 @@ func UrlTitle(msg string) string {
 	if len(titleMatch) > 1 {
 		title = titleMatch[1]
 	} else {
-		title = fmt.Sprintf("Title Failure")
+		title = fmt.Sprintf("Title Resolution Failure")
 	}
-	newMsg = fmt.Sprintf("[ %v ]->( %v )\n", title, url)
+	newMsg = fmt.Sprintf("[%v](%v)\n", title, url)
 
 	return newMsg
 }
