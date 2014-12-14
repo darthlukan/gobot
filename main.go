@@ -191,7 +191,7 @@ func UrlTitle(msg string) string {
 		newMsg, url, title, word string
 	)
 
-	regex, _ := regexp.Compile(`(?i)<title>(.+?)<\/title>`)
+	regex, _ := regexp.Compile(`(?i)<title>(.*?)<\/title>`)
 
 	msgArray := strings.Split(msg, " ")
 
@@ -218,20 +218,23 @@ func UrlTitle(msg string) string {
 	defer resp.Body.Close()
 
 	rawBody, err := ioutil.ReadAll(resp.Body)
-
 	if err != nil {
 		newMsg = fmt.Sprintf("Could not read response Body of %v ...\n", url)
 		return newMsg
 	}
 
 	body := string(rawBody)
-	titleMatch := regex.FindStringSubmatch(body)
+	noNewLines := strings.Replace(body, "\n", " ", -1)
+	noCarriageReturns := strings.Replace(noNewLines, "\r", " ", -1)
+	notSoRawBody := noCarriageReturns
+
+	titleMatch := regex.FindStringSubmatch(notSoRawBody)
 	if len(titleMatch) > 1 {
 		title = titleMatch[1]
 	} else {
 		title = fmt.Sprintf("Title Resolution Failure")
 	}
-	newMsg = fmt.Sprintf("[%v](%v)\n", title, url)
+	newMsg = fmt.Sprintf("[ %v ]( %v )\n", title, url)
 
 	return newMsg
 }
