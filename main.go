@@ -26,7 +26,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"time"
 	"github.com/darthlukan/cakeday"
 	"github.com/thoj/go-ircevent"
 	"io"
@@ -36,6 +35,7 @@ import (
 	"os"
 	"regexp"
 	"strings"
+	"time"
 )
 
 type Config struct {
@@ -107,27 +107,28 @@ func LogDir(CreateDir string) {
 
 func LogFile(CreateFile string) {
 
-	//Check if the Log File for the Channel(s) Exists if not create it 
+	//Check if the Log File for the Channel(s) Exists if not create it
 	if _, err := os.Stat(CreateFile + ".log"); os.IsNotExist(err) {
-		fmt.Printf("Log File " + CreateFile + ".log Doesn't Exist. Creating Log File.")
-		os.Create( CreateFile + ".log")
-		fmt.Printf("Log File " + CreateFile + ".log Created.")
+		fmt.Printf("Log File " + CreateFile + ".log Doesn't Exist. Creating Log File.\n")
+		os.Create(CreateFile + ".log")
+		fmt.Printf("Log File " + CreateFile + ".log Created.\n")
 	} else {
-		fmt.Printf("Log File Exists.")
+		fmt.Printf("Log File Exists.\n")
 	}
 }
 
 // Begin Bot Channel Logging.
 func ChannelLogger(Log string, UserNick string, message string) {
 	STime := time.Now().UTC().Format(time.ANSIC)
+	log := strings.TrimPrefix(Log, "#")
 
 	//Open the file for writing With Append Flag to create file persistence
-	f, err := os.OpenFile(Log + ".log", os.O_RDWR|os.O_APPEND|os.O_SYNC, 0666)
+	f, err := os.OpenFile(log+".log", os.O_RDWR|os.O_APPEND|os.O_SYNC, 0666)
 	if err != nil {
 		fmt.Println(err)
 	}
 	//And Write the Logs with timestamps :)
-	n, err := io.WriteString(f, STime + " > " + UserNick + message + "\n")
+	n, err := io.WriteString(f, fmt.Sprintf("%v > %v: %v\n", STime, UserNick, message))
 	if err != nil {
 		fmt.Println(n, err)
 	}
@@ -268,15 +269,15 @@ func AddCallbacks(conn *irc.Connection, config *Config) {
 			LogFile(config.LogDir + e.Arguments[0])
 		}
 		message := " has joined"
-		ChannelLogger(config.LogDir + e.Arguments[0], e.Nick, message)
+		ChannelLogger(config.LogDir+e.Arguments[0], e.Nick, message)
 	})
 	conn.AddCallback("PART", func(e *irc.Event) {
 		message := " has parted"
-		ChannelLogger(config.LogDir + e.Arguments[0], e.Nick, message)
+		ChannelLogger(config.LogDir+e.Arguments[0], e.Nick, message)
 	})
-	conn.AddCallback("QUIT", func (e *irc.Event) {
+	conn.AddCallback("QUIT", func(e *irc.Event) {
 		message := " has quit"
-		ChannelLogger(config.LogDir + e.Arguments[0], e.Nick, message)
+		ChannelLogger(config.LogDir+e.Arguments[0], e.Nick, message)
 	})
 
 	conn.AddCallback("PRIVMSG", func(e *irc.Event) {
@@ -297,7 +298,7 @@ func AddCallbacks(conn *irc.Connection, config *Config) {
 		}
 
 		if len(message) > 0 {
-			ChannelLogger(config.LogDir + e.Arguments[0], e.Nick + ": ", message)
+			ChannelLogger(config.LogDir+e.Arguments[0], e.Nick+": ", message)
 		}
 	})
 }
