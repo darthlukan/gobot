@@ -106,7 +106,7 @@ func LogDir(CreateDir string) {
 }
 
 func LogFile(CreateFile string) {
-	log := strings.TrimPrefix(CreateFile, "#")
+	log := strings.Replace(CreateFile, "#", "", 1)
 	//Check if the Log File for the Channel(s) Exists if not create it
 	if _, err := os.Stat(log + ".log"); os.IsNotExist(err) {
 		fmt.Printf("Log File " + log + ".log Doesn't Exist. Creating Log File.\n")
@@ -120,7 +120,7 @@ func LogFile(CreateFile string) {
 // Begin Bot Channel Logging.
 func ChannelLogger(Log string, UserNick string, message string) {
 	STime := time.Now().UTC().Format(time.ANSIC)
-	log := strings.TrimPrefix(Log, "#")
+	log := strings.Replace(Log, "#", "", 1)
 
 	//Open the file for writing With Append Flag to create file persistence
 	f, err := os.OpenFile(log+".log", os.O_RDWR|os.O_APPEND|os.O_SYNC, 0666)
