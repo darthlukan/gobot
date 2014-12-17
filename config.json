@@ -1,9 +1,9 @@
 {
-	"Server": "irc.freenode.net:6667",
-	"Channel": "#evolveos",
-	"BotUser": "Gobot",
-	"BotNick": "Gobot",
-	"LogDir": "/tmp/gobot/",
+    "Server": "irc.freenode.net:6667",
+    "Channel": "#evolveos",
+    "BotUser": "Gobot",
+    "BotNick": "Gobot",
+    "LogDir": "/tmp/gobot/",
     "WikiLink": "https://evolve-os.com/wiki",
     "Homepage": "https://evolve-os.com/",
     "Forums": "https://evolve-os.com/forums"
