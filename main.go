@@ -39,7 +39,7 @@ import (
 )
 
 type Config struct {
-	Server, Channel, BotUser, BotNick, WeatherKey, LogDir string
+	Server, Channel, BotUser, BotNick, WeatherKey, LogDir, WikiLink, Homepage, Forums string
 }
 
 var phrases = []string{
@@ -56,6 +56,47 @@ var phrases = []string{
 
 func RandomString() string {
 	return phrases[rand.Intn(len(phrases))]
+}
+
+// Begin Bot Channel Logging.
+func ChannelLogger(Log string, UserNick string, message string) {
+	STime := time.Now().UTC().Format(time.ANSIC)
+	log := strings.Replace(Log, "#", "", 1)
+
+	//Open the file for writing With Append Flag to create file persistence
+	f, err := os.OpenFile(log+".log", os.O_RDWR|os.O_APPEND|os.O_SYNC, 0666)
+	if err != nil {
+		fmt.Println(err)
+	}
+	//And Write the Logs with timestamps :)
+	n, err := io.WriteString(f, fmt.Sprintf("%v > %v: %v\n", STime, UserNick, message))
+	if err != nil {
+		fmt.Println(n, err)
+	}
+	f.Close()
+}
+
+func LogDir(CreateDir string) {
+
+	//Check if the LogDir Exists. And if not Create it.
+	if _, err := os.Stat(CreateDir); os.IsNotExist(err) {
+		fmt.Printf("No such file or directory: %s\n", CreateDir)
+		os.Mkdir(CreateDir, 0777)
+	} else {
+		fmt.Printf("Its There: %s\n", CreateDir)
+	}
+}
+
+func LogFile(CreateFile string) {
+	log := strings.Replace(CreateFile, "#", "", 1)
+	//Check if the Log File for the Channel(s) Exists if not create it
+	if _, err := os.Stat(log + ".log"); os.IsNotExist(err) {
+		fmt.Printf("Log File " + log + ".log Doesn't Exist. Creating Log File.\n")
+		os.Create(log + ".log")
+		fmt.Printf("Log File " + log + ".log Created.\n")
+	} else {
+		fmt.Printf("Log File Exists.\n")
+	}
 }
 
 // ParseCmds takes PRIVMSG strings containing a preceding bang "!"
@@ -87,52 +128,13 @@ func ParseCmds(cmdMsg string, config *Config) string {
 	} else {
 		if strings.Contains(msgArray[0], "help") {
 			msg = HelpCmd()
+		} else if strings.Contains(msgArray[0], "wiki") {
+			msg = WikiCmd(config)
 		} else {
 			msg = "I did not understand your command. Try '!slap Setsuna-Xero really hard'"
 		}
 	}
 	return msg
-}
-
-func LogDir(CreateDir string) {
-
-	//Check if the LogDir Exists. And if not Create it.
-	if _, err := os.Stat(CreateDir); os.IsNotExist(err) {
-		fmt.Printf("No such file or directory: %s\n", CreateDir)
-		os.Mkdir(CreateDir, 0777)
-	} else {
-		fmt.Printf("Its There: %s\n", CreateDir)
-	}
-}
-
-func LogFile(CreateFile string) {
-	log := strings.Replace(CreateFile, "#", "", 1)
-	//Check if the Log File for the Channel(s) Exists if not create it
-	if _, err := os.Stat(log + ".log"); os.IsNotExist(err) {
-		fmt.Printf("Log File " + log + ".log Doesn't Exist. Creating Log File.\n")
-		os.Create(log + ".log")
-		fmt.Printf("Log File " + log + ".log Created.\n")
-	} else {
-		fmt.Printf("Log File Exists.\n")
-	}
-}
-
-// Begin Bot Channel Logging.
-func ChannelLogger(Log string, UserNick string, message string) {
-	STime := time.Now().UTC().Format(time.ANSIC)
-	log := strings.Replace(Log, "#", "", 1)
-
-	//Open the file for writing With Append Flag to create file persistence
-	f, err := os.OpenFile(log+".log", os.O_RDWR|os.O_APPEND|os.O_SYNC, 0666)
-	if err != nil {
-		fmt.Println(err)
-	}
-	//And Write the Logs with timestamps :)
-	n, err := io.WriteString(f, fmt.Sprintf("%v > %v: %v\n", STime, UserNick, message))
-	if err != nil {
-		fmt.Println(n, err)
-	}
-	f.Close()
 }
 
 // Commands
@@ -180,6 +182,18 @@ func HelpCmd() string {
 	msgp5 := "!VERB <msg>: Perform the selected verb in <msg> context. Example: !slap setkeh\n"
 	msg := fmt.Sprintf("%s %s %s %s %s", msgp1, msgp2, msgp3, msgp4, msgp5)
 	return msg
+}
+
+func WikiCmd(config *Config) string {
+	return fmt.Sprintf("(Channel Wiki)[%s]\n", config.WikiLink)
+}
+
+func HomePageCmd(config *Config) string {
+	return fmt.Sprintf("(Channel Homepage)[%s]\n", config.Homepage)
+}
+
+func ForumCmd(config *Config) string {
+	return fmt.Sprintf("(Channel Forums)[%s]\n", config.Forums)
 }
 
 // UrlTitle attempts to extract the title of the page that a
@@ -238,24 +252,6 @@ func UrlTitle(msg string) string {
 
 	return newMsg
 }
-
-//func QueryWeather(query string, config *Config) string {
-//	var beginUrl string = "http://api.worldweatheronline.com/free/v1/weather.ashx?q="
-//	var endUrl string = "&format=json&num_of_days=1&date=today&includelocation=yes&show_comments=no&key="
-
-//	city := query
-//	url := fmt.Sprintf("%v%v%v%v", beginUrl, city, endUrl, config.WeatherKey)
-//	client := http.Client()
-//	response, err := client.Get(url)
-
-//	if err != nil {
-//		return fmt.Sprintf("Caught error: %v", err.Error())
-//	}
-//	weatherJson := json.Decoder(response.Body)
-//	weather := fmt.Sprintf("Weather for %v: %vC", weatherJson)
-//	return weather
-
-//}
 
 func QueryGoogle(query string) string {
 	var results string

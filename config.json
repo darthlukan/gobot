@@ -1,7 +1,10 @@
 {
 	"Server": "irc.freenode.net:6667",
-	"Channel": "#tinfoilhats",
+	"Channel": "#evolveos",
 	"BotUser": "Gobot",
 	"BotNick": "Gobot",
-	"LogDir": "/tmp/gobot/"
+	"LogDir": "/tmp/gobot/",
+    "WikiLink": "https://evolve-os.com/wiki",
+    "Homepage": "https://evolve-os.com/",
+    "Forums": "https://evolve-os.com/forums"
 }
