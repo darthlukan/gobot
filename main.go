@@ -130,6 +130,10 @@ func ParseCmds(cmdMsg string, config *Config) string {
 			msg = HelpCmd()
 		} else if strings.Contains(msgArray[0], "wiki") {
 			msg = WikiCmd(config)
+		} else if strings.Contains(msgArray[0], "homepage") {
+			msg = HomePageCmd(config)
+		} else if strings.Contains(msgArray[0], "forums") {
+			msg = ForumsCmd(config)
 		} else {
 			msg = "I did not understand your command. Try '!slap Setsuna-Xero really hard'"
 		}
