@@ -282,12 +282,12 @@ func AddCallbacks(conn *irc.Connection, config *Config) {
 	conn.AddCallback("PART", func(e *irc.Event) {
 		pmessage := "parted"
 		message := e.Message()
-		ChannelLogger(config.LogDir+config.Channel, e.Nick + "@" + e.Host, pmessage + " (" + message + ")")
+		ChannelLogger(config.LogDir+config.Channel, e.Nick + "@" + e.Host, pmessage + "\s"+"(" + message + ")")
 	})
 	conn.AddCallback("QUIT", func(e *irc.Event) {
 		qmessage := "has quit"
 		message := e.Message()
-		ChannelLogger(config.LogDir+config.Channel, e.Nick + "@" + e.Host, qmessage + " (" + message + ")")
+		ChannelLogger(config.LogDir+config.Channel, e.Nick + "@" + e.Host, qmessage + "\s"+"(" + message + ")")
 	})
 
 	conn.AddCallback("PRIVMSG", func(e *irc.Event) {
