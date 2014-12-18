@@ -280,12 +280,14 @@ func AddCallbacks(conn *irc.Connection, config *Config) {
 		ChannelLogger(config.LogDir+e.Arguments[0], e.Nick, message)
 	})
 	conn.AddCallback("PART", func(e *irc.Event) {
-		message := " has parted"
-		ChannelLogger(config.LogDir+e.Arguments[0], e.Nick, message)
+		pmessage := "parted"
+		message := e.Message()
+		ChannelLogger(config.LogDir+config.Channel, e.Nick + "@" + e.Host, pmessage + " "+"(" + message + ")")
 	})
 	conn.AddCallback("QUIT", func(e *irc.Event) {
-		message := " has quit"
-		ChannelLogger(config.LogDir+e.Arguments[0], e.Nick, message)
+		qmessage := "has quit"
+		message := e.Message()
+		ChannelLogger(config.LogDir+config.Channel, e.Nick + "@" + e.Host, qmessage + " "+"(" + message + ")")
 	})
 
 	conn.AddCallback("PRIVMSG", func(e *irc.Event) {
