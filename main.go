@@ -52,6 +52,11 @@ var phrases = []string{
 	"don't ask...",
 	"then makes a sandwich.",
 	"oh noes!",
+    "did I do that?",
+    "why must you turn this place into a house of lies!",
+    "really???",
+    "LLLLEEEEEERRRRRROOOOYYYY JEEEENNNKINNNS!"
+    "DOH!"
 }
 
 func RandomString() string {
