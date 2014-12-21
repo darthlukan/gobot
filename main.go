@@ -313,7 +313,9 @@ func AddCallbacks(conn *irc.Connection, config *Config) {
 		}
 
 		if len(message) > 0 {
-			ChannelLogger(config.LogDir+e.Arguments[0], e.Nick+": ", message)
+			if e.Arguments[0] != config.BotNick {
+				ChannelLogger(config.LogDir+e.Arguments[0], e.Nick+": ", message)
+			}
 		}
 	})
 }
