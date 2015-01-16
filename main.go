@@ -26,6 +26,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/ajanicij/goduckgo/goduckgo"
 	"github.com/darthlukan/cakeday"
 	"github.com/thoj/go-ircevent"
 	"io"
@@ -128,6 +129,9 @@ func ParseCmds(cmdMsg string, config *Config) string {
 			msg = WeatherCmd()
 		} else if strings.Contains(cmd, "cakeday") {
 			msg = CakeDayCmd(msgArray[1])
+		} else if strings.Contains(cmd, "ddg") || strings.Contains(cmd, "search") {
+			query := strings.Join(msgArray[1:], " ")
+			msg = WebSearch(query)
 		} else {
 			msg = GenericVerbCmd(cmd, msgArray[1])
 		}
@@ -183,7 +187,7 @@ func CakeDayCmd(user string) string {
 }
 
 func HelpCmd() string {
-	return fmt.Sprintf("Available commands: !help, !weather (NYI), !cakeday, !VERB\n")
+	return fmt.Sprintf("Available commands: !help, !ddg/search !weather (NYI), !cakeday, !VERB\n")
 }
 
 func WikiCmd(config *Config) string {
@@ -247,10 +251,17 @@ func UrlTitle(msg string) string {
 	return newMsg
 }
 
-func QueryGoogle(query string) string {
-	var results string
-	// TODO: Logic!
-	return results
+func WebSearch(query string) string {
+	msg, err := goduckgo.Query(query)
+	if err != nil {
+		return fmt.Sprintf("DDG Error: %v\n", err)
+	}
+
+	if len(msg.Results) > 0 {
+		return fmt.Sprintf("First result: [ %s ]( %v )\n", msg.Results[0].FirstURL, msg.Results[0].Text)
+	} else {
+		return fmt.Sprintf("Query: '%s' returned no results.\n", query)
+	}
 }
 
 // AddCallbacks is a single function that does what it says.
