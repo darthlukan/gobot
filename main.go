@@ -52,11 +52,11 @@ var phrases = []string{
 	"don't ask...",
 	"then makes a sandwich.",
 	"oh noes!",
-    "did I do that?",
-    "why must you turn this place into a house of lies!",
-    "really???",
-    "LLLLEEEEEERRRRRROOOOYYYY JEEEENNNKINNNS!"
-    "DOH!"
+	"did I do that?",
+	"why must you turn this place into a house of lies!",
+	"really???",
+	"LLLLEEEEEERRRRRROOOOYYYY JEEEENNNKINNNS!",
+	"DOH!",
 }
 
 func RandomString() string {
@@ -67,22 +67,22 @@ func RandomString() string {
 func ChannelLogger(Log string, UserNick string, message string) {
 	STime := time.Now().UTC().Format(time.ANSIC)
 	log := strings.Replace(Log, "#", "", 1)
+	logFile := fmt.Sprintf("%s.log", log)
 
 	//Open the file for writing With Append Flag to create file persistence
-	f, err := os.OpenFile(log+".log", os.O_RDWR|os.O_APPEND|os.O_SYNC, 0666)
+	f, err := os.OpenFile(logFile, os.O_RDWR|os.O_APPEND|os.O_SYNC, 0666)
 	if err != nil {
 		fmt.Println(err)
 	}
+	defer f.Close()
 	//And Write the Logs with timestamps :)
 	n, err := io.WriteString(f, fmt.Sprintf("%v > %v: %v\n", STime, UserNick, message))
 	if err != nil {
 		fmt.Println(n, err)
 	}
-	f.Close()
 }
 
 func LogDir(CreateDir string) {
-
 	//Check if the LogDir Exists. And if not Create it.
 	if _, err := os.Stat(CreateDir); os.IsNotExist(err) {
 		fmt.Printf("No such file or directory: %s\n", CreateDir)
@@ -94,13 +94,14 @@ func LogDir(CreateDir string) {
 
 func LogFile(CreateFile string) {
 	log := strings.Replace(CreateFile, "#", "", 1)
+	logFile := fmt.Sprintf("%s.log", log)
 	//Check if the Log File for the Channel(s) Exists if not create it
-	if _, err := os.Stat(log + ".log"); os.IsNotExist(err) {
-		fmt.Printf("Log File " + log + ".log Doesn't Exist. Creating Log File.\n")
-		os.Create(log + ".log")
-		fmt.Printf("Log File " + log + ".log Created.\n")
+	if _, err := os.Stat(logFile); os.IsNotExist(err) {
+		fmt.Printf("Log File %s Doesn't Exist. Creating Log File.\n", logFile)
+		os.Create(logFile)
+		fmt.Printf("Log File %s Created.\n", logFile)
 	} else {
-		fmt.Printf("Log File Exists.\n")
+		fmt.Printf("Log File %s Exists.\n", logFile)
 	}
 }
 
@@ -155,8 +156,7 @@ func GenericVerbCmd(cmd, extra string) string {
 	// If given the command:
 	//     "!slap $USER"
 	randPhrase := RandomString()
-	msg := fmt.Sprintf("\x01"+"ACTION %v %v, %v\x01", cmd, extra, randPhrase)
-	return msg
+	return fmt.Sprintf("\x01"+"ACTION %v %v, %v\x01", cmd, extra, randPhrase)
 }
 
 // WeatherCmd is NYI
@@ -164,33 +164,26 @@ func WeatherCmd() string {
 	// weatherArray := strings.Split(msgArray[1], " ", 2)
 	// query := strings.Join(weatherArray[0], "")
 	// msg = QueryWeather(query, config)
-	msg := "Look outside, this feature isn't implemented just yet.\n"
-	return msg
+	return fmt.Sprintf("Look outside, this feature isn't implemented just yet.\n")
 }
 
 // CakeDayCmd returns a string containing the Reddit cakeday of a user
 // upon success, or an error string on failure.
 func CakeDayCmd(user string) string {
+	var msg string
 	// !cakeday $USER
 	responseString, err := cakeday.Get(user)
 	if err != nil {
-		msg := fmt.Sprintf("I caught an error: %v\n", err)
-		return msg
+		msg = fmt.Sprintf("I caught an error: %v\n", err)
+	} else {
+		// >> Reddit Cake Day for $USER is: $CAKEDAY
+		msg = fmt.Sprintf("%v\n", responseString)
 	}
-
-	// >> Reddit Cake Day for $USER is: $CAKEDAY
-	msg := fmt.Sprintf("%v\n", responseString)
 	return msg
 }
 
 func HelpCmd() string {
-	msgp1 := "Available commands: !help, !weather (NYI), !cakeday, !VERB\n"
-	msgp2 := "!help: Display this help message.\n"
-	msgp3 := "!weather <city>: Not yet implemented.\n"
-	msgp4 := "!cakeday <username>: Get the Reddit Cake Day for the requested user.\n"
-	msgp5 := "!VERB <msg>: Perform the selected verb in <msg> context. Example: !slap setkeh\n"
-	msg := fmt.Sprintf("%s %s %s %s %s", msgp1, msgp2, msgp3, msgp4, msgp5)
-	return msg
+	return fmt.Sprintf("Available commands: !help, !weather (NYI), !cakeday, !VERB\n")
 }
 
 func WikiCmd(config *Config) string {
@@ -225,35 +218,27 @@ func UrlTitle(msg string) string {
 		}
 	}
 
-	// Band-AID. TODO: Fix this properly.
-	if strings.Contains(url, "imgur") || strings.Contains(url, ".jpg") || strings.Contains(url, ".png") || strings.Contains(url, ".gif") {
-		newMsg = fmt.Sprintf("Cannot resolve Image / Imgur links right now, beware...\n")
-		return newMsg
-	}
-
 	resp, err := http.Get(url)
 
 	if err != nil {
-		newMsg = fmt.Sprintf("Could not resolve URL %v, beware...\n", url)
-		return newMsg
+		return fmt.Sprintf("Could not resolve URL %v, beware...\n", url)
 	}
 
 	defer resp.Body.Close()
 
 	rawBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		newMsg = fmt.Sprintf("Could not read response Body of %v ...\n", url)
-		return newMsg
+		return fmt.Sprintf("Could not read response Body of %v ...\n", url)
 	}
 
 	body := string(rawBody)
-	noNewLines := strings.Replace(body, "\n", " ", -1)
-	noCarriageReturns := strings.Replace(noNewLines, "\r", " ", -1)
+	noNewLines := strings.Replace(body, "\n", "", -1)
+	noCarriageReturns := strings.Replace(noNewLines, "\r", "", -1)
 	notSoRawBody := noCarriageReturns
 
 	titleMatch := regex.FindStringSubmatch(notSoRawBody)
 	if len(titleMatch) > 1 {
-		title = titleMatch[1]
+		title = strings.TrimSpace(titleMatch[1])
 	} else {
 		title = fmt.Sprintf("Title Resolution Failure")
 	}
@@ -281,18 +266,18 @@ func AddCallbacks(conn *irc.Connection, config *Config) {
 			LogDir(config.LogDir)
 			LogFile(config.LogDir + e.Arguments[0])
 		}
-		message := " has joined"
-		ChannelLogger(config.LogDir+e.Arguments[0], e.Nick, message)
+		message := fmt.Sprintf("%s has joined", e.Nick)
+		go ChannelLogger(config.LogDir+e.Arguments[0], e.Nick, message)
 	})
 	conn.AddCallback("PART", func(e *irc.Event) {
 		pmessage := "parted"
 		message := e.Message()
-		ChannelLogger(config.LogDir+config.Channel, e.Nick + "@" + e.Host, pmessage + " "+"(" + message + ")")
+		go ChannelLogger(config.LogDir+config.Channel, e.Nick+"@"+e.Host, pmessage+" "+"("+message+")")
 	})
 	conn.AddCallback("QUIT", func(e *irc.Event) {
 		qmessage := "has quit"
 		message := e.Message()
-		ChannelLogger(config.LogDir+config.Channel, e.Nick + "@" + e.Host, qmessage + " "+"(" + message + ")")
+		go ChannelLogger(config.LogDir+config.Channel, e.Nick+"@"+e.Host, qmessage+" "+"("+message+")")
 	})
 
 	conn.AddCallback("PRIVMSG", func(e *irc.Event) {
@@ -304,7 +289,7 @@ func AddCallbacks(conn *irc.Connection, config *Config) {
 			response = ParseCmds(message, config)
 		}
 
-		if strings.Contains(message, "http") || strings.Contains(message, "www") {
+		if strings.Contains(message, "http://") || strings.Contains(message, "https://") || strings.Contains(message, "www.") {
 			response = UrlTitle(message)
 		}
 
@@ -314,7 +299,7 @@ func AddCallbacks(conn *irc.Connection, config *Config) {
 
 		if len(message) > 0 {
 			if e.Arguments[0] != config.BotNick {
-				ChannelLogger(config.LogDir+e.Arguments[0], e.Nick+": ", message)
+				go ChannelLogger(config.LogDir+e.Arguments[0], e.Nick+": ", message)
 			}
 		}
 	})
@@ -329,7 +314,6 @@ func Connect(conn *irc.Connection, config *Config) error {
 	for attempt := 1; attempt <= 3; attempt++ {
 		if err = conn.Connect(config.Server); err != nil {
 			fmt.Println("Connection attempt %v failed, trying again...", attempt)
-			continue
 		} else {
 			break
 		}
@@ -347,6 +331,7 @@ func main() {
 		fmt.Println("Couldn't read config file, dying...")
 		panic(err)
 	}
+	defer file.Close()
 
 	decoder := json.NewDecoder(file)
 	config := &Config{}
