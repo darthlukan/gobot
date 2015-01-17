@@ -3,6 +3,7 @@
     "Channel": "#evolveos",
     "BotUser": "Gobot",
     "BotNick": "Gobot",
+    "Trigger": "!",
     "LogDir": "/tmp/gobot/",
     "WikiLink": "https://evolve-os.com/wiki",
     "Homepage": "https://evolve-os.com/",
