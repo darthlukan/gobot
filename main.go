@@ -40,7 +40,7 @@ import (
 )
 
 type Config struct {
-	Server, Channel, BotUser, BotNick, WeatherKey, LogDir, WikiLink, Homepage, Forums string
+	Server, Channel, BotUser, BotNick, Trigger, WeatherKey, LogDir, WikiLink, Homepage, Forums string
 }
 
 var phrases = []string{
