@@ -258,7 +258,11 @@ func WebSearch(query string) string {
 	}
 
 	if len(msg.Results) > 0 {
-		return fmt.Sprintf("First result: [ %s ]( %v )\n", msg.Results[0].FirstURL, msg.Results[0].Text)
+		return fmt.Sprintf("First External result: [ %s ]( %s )\n", msg.Results[0].FirstURL, msg.Results[0].Text)
+	} else if len(msg.Redirect) > 0 {
+		return UrlTitle(msg.Redirect)
+	} else if len(msg.RelatedTopics) > 0 {
+		return fmt.Sprintf("First Topical Result: [ %s ]( %s )\n", msg.RelatedTopics[0].FirstURL, msg.RelatedTopics[0].Text)
 	} else {
 		return fmt.Sprintf("Query: '%s' returned no results.\n", query)
 	}
