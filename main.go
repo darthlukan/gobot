@@ -194,15 +194,15 @@ func HelpCmd() string {
 }
 
 func WikiCmd(config *Config) string {
-	return fmt.Sprintf("(Channel Wiki)[%s]\n", config.WikiLink)
+	return fmt.Sprintf("(Channel Wiki)[ %s ]\n", config.WikiLink)
 }
 
 func HomePageCmd(config *Config) string {
-	return fmt.Sprintf("(Channel Homepage)[%s]\n", config.Homepage)
+	return fmt.Sprintf("(Channel Homepage)[ %s ]\n", config.Homepage)
 }
 
 func ForumCmd(config *Config) string {
-	return fmt.Sprintf("(Channel Forums)[%s]\n", config.Forums)
+	return fmt.Sprintf("(Channel Forums)[ %s ]\n", config.Forums)
 }
 
 // UrlTitle attempts to extract the title of the page that a
@@ -254,6 +254,8 @@ func UrlTitle(msg string) string {
 	return newMsg
 }
 
+// WebSearch takes a query string as an argument and returns
+// a formatted string containing the results from DuckDuckGo.
 func WebSearch(query string) string {
 	msg, err := goduckgo.Query(query)
 	if err != nil {
@@ -275,6 +277,8 @@ func WebSearch(query string) string {
 // AddCallbacks is a single function that does what it says.
 // It's merely a way of decluttering the main function.
 func AddCallbacks(conn *irc.Connection, config *Config) {
+	log := fmt.Sprintf("%s%s", config.LogDir, config.Channel)
+
 	conn.AddCallback("001", func(e *irc.Event) {
 		conn.Join(config.Channel)
 	})
@@ -286,17 +290,17 @@ func AddCallbacks(conn *irc.Connection, config *Config) {
 			LogFile(config.LogDir + e.Arguments[0])
 		}
 		message := fmt.Sprintf("%s has joined", e.Nick)
-		go ChannelLogger(config.LogDir+e.Arguments[0], e.Nick, message)
+		go ChannelLogger(log, e.Nick, message)
 	})
 	conn.AddCallback("PART", func(e *irc.Event) {
-		pmessage := "parted"
-		message := e.Message()
-		go ChannelLogger(config.LogDir+config.Channel, e.Nick+"@"+e.Host, pmessage+" "+"("+message+")")
+		message := fmt.Sprintf("has parted (%s)", e.Message())
+		nick := fmt.Sprintf("%s@%s", e.Nick, e.Host)
+		go ChannelLogger(log, nick, message)
 	})
 	conn.AddCallback("QUIT", func(e *irc.Event) {
-		qmessage := "has quit"
-		message := e.Message()
-		go ChannelLogger(config.LogDir+config.Channel, e.Nick+"@"+e.Host, qmessage+" "+"("+message+")")
+		message := fmt.Sprintf("has quit (%s)", e.Message)
+		nick := fmt.Sprintf("%s@%s", e.Nick, e.Host)
+		go ChannelLogger(log, nick, message)
 	})
 
 	conn.AddCallback("PRIVMSG", func(e *irc.Event) {
@@ -316,7 +320,7 @@ func AddCallbacks(conn *irc.Connection, config *Config) {
 
 		if len(message) > 0 {
 			if e.Arguments[0] != config.BotNick {
-				go ChannelLogger(config.LogDir+e.Arguments[0], e.Nick+": ", message)
+				go ChannelLogger(log, e.Nick+": ", message)
 			}
 		}
 	})
