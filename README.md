@@ -54,7 +54,7 @@ GoBot
 ## TODO
 
 - 1. Add commands that actually do something useful
-- 2. Google Search
+- 2. ~~DuckDuckGo Search~~
 - 3. ~~~Logging~~~
 - 4. Tests would be nice >.>
 
