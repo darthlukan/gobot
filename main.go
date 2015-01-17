@@ -26,8 +26,8 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/ajanicij/goduckgo/goduckgo"
 	"github.com/darthlukan/cakeday"
+	"github.com/darthlukan/goduckgo/goduckgo"
 	"github.com/thoj/go-ircevent"
 	"io"
 	"io/ioutil"
