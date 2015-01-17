@@ -306,11 +306,11 @@ func AddCallbacks(conn *irc.Connection, config *Config) {
 	conn.AddCallback("PRIVMSG", func(e *irc.Event) {
 		var response string
 		message := e.Message()
-		switch {
-		case strings.Contains(message, config.Trigger) && strings.Index(message, config.Trigger) == 0:
+		if strings.Contains(message, config.Trigger) && strings.Index(message, config.Trigger) == 0 {
 			// This is a command, parse it.
 			response = ParseCmds(message, config)
-		case strings.Contains(message, "http://"), strings.Contains(message, "https://"), strings.Contains(message, "www."):
+		}
+		if strings.Contains(message, "http://") || strings.Contains(message, "https://") || strings.Contains(message, "www.") {
 			response = UrlTitle(message)
 		}
 
