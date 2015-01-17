@@ -42,7 +42,7 @@ import (
 const delay = 40
 
 type Config struct {
-	Server, Channel, BotUser, BotNick, WeatherKey, LogDir, WikiLink, Homepage, Forums string
+	Server, Channel, BotUser, BotNick, Trigger, WeatherKey, LogDir, WikiLink, Homepage, Forums string
 }
 
 var phrases = []string{
@@ -118,7 +118,7 @@ func ParseCmds(cmdMsg string, config *Config) string {
 		cmdArray []string
 	)
 
-	cmdArray = strings.SplitAfterN(cmdMsg, "!", 2)
+	cmdArray = strings.SplitAfterN(cmdMsg, config.Trigger, 2)
 
 	if len(cmdArray) > 0 {
 		msgArray = strings.SplitN(cmdArray[1], " ", 2)
@@ -303,7 +303,7 @@ func AddCallbacks(conn *irc.Connection, config *Config) {
 		var response string
 		message := e.Message()
 		switch {
-		case strings.Contains(message, "!") && strings.Index(message, "!") == 0:
+		case strings.Contains(message, config.Trigger) && strings.Index(message, config.Trigger) == 0:
 			// This is a command, parse it.
 			response = ParseCmds(message, config)
 		case strings.Contains(message, "http://"), strings.Contains(message, "https://"), strings.Contains(message, "www."):
