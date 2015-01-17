@@ -116,7 +116,7 @@ func ParseCmds(cmdMsg string, config *Config) string {
 		cmdArray []string
 	)
 
-	cmdArray = strings.SplitAfterN(cmdMsg, "!", 2)
+	cmdArray = strings.SplitAfterN(cmdMsg, config.Trigger, 2)
 
 	if len(cmdArray) > 0 {
 		msgArray = strings.SplitN(cmdArray[1], " ", 2)
@@ -299,7 +299,7 @@ func AddCallbacks(conn *irc.Connection, config *Config) {
 		var response string
 		message := e.Message()
 
-		if strings.Contains(message, "!") && strings.Index(message, "!") == 0 {
+		if strings.Contains(message, config.Trigger) && strings.Index(message, config.Trigger) == 0 {
 			// This is a command, parse it.
 			response = ParseCmds(message, config)
 		}
