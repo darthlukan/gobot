@@ -39,6 +39,8 @@ import (
 	"time"
 )
 
+const delay = 40
+
 type Config struct {
 	Server, Channel, BotUser, BotNick, WeatherKey, LogDir, WikiLink, Homepage, Forums string
 }
@@ -124,27 +126,28 @@ func ParseCmds(cmdMsg string, config *Config) string {
 
 	if len(msgArray) > 1 {
 		cmd := fmt.Sprintf("%vs", msgArray[0])
-
-		if strings.Contains(cmd, "weather") {
+		switch {
+		case strings.Contains(cmd, "weather"):
 			msg = WeatherCmd()
-		} else if strings.Contains(cmd, "cakeday") {
+		case strings.Contains(cmd, "cakeday"):
 			msg = CakeDayCmd(msgArray[1])
-		} else if strings.Contains(cmd, "ddg") || strings.Contains(cmd, "search") {
+		case strings.Contains(cmd, "ddg"), strings.Contains(cmd, "search"):
 			query := strings.Join(msgArray[1:], " ")
 			msg = WebSearch(query)
-		} else {
+		default:
 			msg = GenericVerbCmd(cmd, msgArray[1])
 		}
 	} else {
-		if strings.Contains(msgArray[0], "help") {
+		switch {
+		case strings.Contains(msgArray[0], "help"):
 			msg = HelpCmd()
-		} else if strings.Contains(msgArray[0], "wiki") {
+		case strings.Contains(msgArray[0], "wiki"):
 			msg = WikiCmd(config)
-		} else if strings.Contains(msgArray[0], "homepage") {
+		case strings.Contains(msgArray[0], "homepage"):
 			msg = HomePageCmd(config)
-		} else if strings.Contains(msgArray[0], "forums") {
+		case strings.Contains(msgArray[0], "forums"):
 			msg = ForumCmd(config)
-		} else {
+		default:
 			msg = "I did not understand your command. Try '!slap Setsuna-Xero really hard'"
 		}
 	}
@@ -257,13 +260,14 @@ func WebSearch(query string) string {
 		return fmt.Sprintf("DDG Error: %v\n", err)
 	}
 
-	if len(msg.Results) > 0 {
-		return fmt.Sprintf("First External result: [ %s ]( %s )\n", msg.Results[0].FirstURL, msg.Results[0].Text)
-	} else if len(msg.Redirect) > 0 {
-		return UrlTitle(msg.Redirect)
-	} else if len(msg.RelatedTopics) > 0 {
+	switch {
+	case len(msg.RelatedTopics) > 0:
 		return fmt.Sprintf("First Topical Result: [ %s ]( %s )\n", msg.RelatedTopics[0].FirstURL, msg.RelatedTopics[0].Text)
-	} else {
+	case len(msg.Results) > 0:
+		return fmt.Sprintf("First External result: [ %s ]( %s )\n", msg.Results[0].FirstURL, msg.Results[0].Text)
+	case len(msg.Redirect) > 0:
+		return fmt.Sprintf("Redirect result: %s\n", UrlTitle(msg.Redirect))
+	default:
 		return fmt.Sprintf("Query: '%s' returned no results.\n", query)
 	}
 }
@@ -298,13 +302,11 @@ func AddCallbacks(conn *irc.Connection, config *Config) {
 	conn.AddCallback("PRIVMSG", func(e *irc.Event) {
 		var response string
 		message := e.Message()
-
-		if strings.Contains(message, "!") && strings.Index(message, "!") == 0 {
+		switch {
+		case strings.Contains(message, "!") && strings.Index(message, "!") == 0:
 			// This is a command, parse it.
 			response = ParseCmds(message, config)
-		}
-
-		if strings.Contains(message, "http://") || strings.Contains(message, "https://") || strings.Contains(message, "www.") {
+		case strings.Contains(message, "http://"), strings.Contains(message, "https://"), strings.Contains(message, "www."):
 			response = UrlTitle(message)
 		}
 
@@ -327,6 +329,7 @@ func Connect(conn *irc.Connection, config *Config) error {
 	var err error
 
 	for attempt := 1; attempt <= 3; attempt++ {
+		time.Sleep(delay * time.Second)
 		if err = conn.Connect(config.Server); err != nil {
 			fmt.Println("Connection attempt %v failed, trying again...", attempt)
 		} else {
