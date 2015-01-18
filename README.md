@@ -2,7 +2,8 @@ GoBot
 ========
 
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/darthlukan/gobot?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![Build Status](https://drone.io/github.com/darthlukan/gobot/status.png)](https://drone.io/github.com/darthlukan/gobot/latest)
+[![Build Status](https://travis-ci.org/darthlukan/gobot.svg?branch=master)](https://travis-ci.org/darthlukan/gobot)
+
 
 ## Description
 
