@@ -26,10 +26,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/darthlukan/cakeday"
-	"github.com/darthlukan/goduckgo/goduckgo"
 	"github.com/thoj/go-ircevent"
-	"io"
 	"io/ioutil"
 	"math/rand"
 	"net/http"
@@ -45,7 +42,7 @@ type Config struct {
 	Server, Channel, BotUser, BotNick, Trigger, WeatherKey, LogDir, WikiLink, Homepage, Forums string
 }
 
-var phrases = []string{
+var quips = []string{
 	"FOR SCIENCE!",
 	"because... reasons.",
 	"it's super effective!",
@@ -62,50 +59,8 @@ var phrases = []string{
 	"DOH!",
 }
 
-func RandomString() string {
-	return phrases[rand.Intn(len(phrases))]
-}
-
-// Begin Bot Channel Logging.
-func ChannelLogger(Log string, UserNick string, message string) {
-	STime := time.Now().UTC().Format(time.ANSIC)
-	log := strings.Replace(Log, "#", "", 1)
-	logFile := fmt.Sprintf("%s.log", log)
-
-	//Open the file for writing With Append Flag to create file persistence
-	f, err := os.OpenFile(logFile, os.O_RDWR|os.O_APPEND|os.O_SYNC, 0666)
-	if err != nil {
-		fmt.Println(err)
-	}
-	defer f.Close()
-	//And Write the Logs with timestamps :)
-	n, err := io.WriteString(f, fmt.Sprintf("%v > %v: %v\n", STime, UserNick, message))
-	if err != nil {
-		fmt.Println(n, err)
-	}
-}
-
-func LogDir(CreateDir string) {
-	//Check if the LogDir Exists. And if not Create it.
-	if _, err := os.Stat(CreateDir); os.IsNotExist(err) {
-		fmt.Printf("No such file or directory: %s\n", CreateDir)
-		os.Mkdir(CreateDir, 0777)
-	} else {
-		fmt.Printf("Its There: %s\n", CreateDir)
-	}
-}
-
-func LogFile(CreateFile string) {
-	log := strings.Replace(CreateFile, "#", "", 1)
-	logFile := fmt.Sprintf("%s.log", log)
-	//Check if the Log File for the Channel(s) Exists if not create it
-	if _, err := os.Stat(logFile); os.IsNotExist(err) {
-		fmt.Printf("Log File %s Doesn't Exist. Creating Log File.\n", logFile)
-		os.Create(logFile)
-		fmt.Printf("Log File %s Created.\n", logFile)
-	} else {
-		fmt.Printf("Log File %s Exists.\n", logFile)
-	}
+func RandomQuip() string {
+	return quips[rand.Intn(len(quips))]
 }
 
 // ParseCmds takes PRIVMSG strings containing a preceding bang "!"
@@ -127,13 +82,11 @@ func ParseCmds(cmdMsg string, config *Config) string {
 	if len(msgArray) > 1 {
 		cmd := fmt.Sprintf("%vs", msgArray[0])
 		switch {
-		case strings.Contains(cmd, "weather"):
-			msg = WeatherCmd()
 		case strings.Contains(cmd, "cakeday"):
 			msg = CakeDayCmd(msgArray[1])
 		case strings.Contains(cmd, "ddg"), strings.Contains(cmd, "search"):
 			query := strings.Join(msgArray[1:], " ")
-			msg = WebSearch(query)
+			msg = SearchCmd(query)
 		default:
 			msg = GenericVerbCmd(cmd, msgArray[1])
 		}
@@ -152,57 +105,6 @@ func ParseCmds(cmdMsg string, config *Config) string {
 		}
 	}
 	return msg
-}
-
-// Commands
-
-// GenericVerbCmd returns a message string based on the supplied cmd (a verb).
-func GenericVerbCmd(cmd, extra string) string {
-	// This should give us something like:
-	//     "Snuffles slaps $USER, FOR SCIENCE!"
-	// If given the command:
-	//     "!slap $USER"
-	randPhrase := RandomString()
-	return fmt.Sprintf("\x01"+"ACTION %v %v, %v\x01", cmd, extra, randPhrase)
-}
-
-// WeatherCmd is NYI
-func WeatherCmd() string {
-	// weatherArray := strings.Split(msgArray[1], " ", 2)
-	// query := strings.Join(weatherArray[0], "")
-	// msg = QueryWeather(query, config)
-	return fmt.Sprintf("Look outside, this feature isn't implemented just yet.\n")
-}
-
-// CakeDayCmd returns a string containing the Reddit cakeday of a user
-// upon success, or an error string on failure.
-func CakeDayCmd(user string) string {
-	var msg string
-	// !cakeday $USER
-	responseString, err := cakeday.Get(user)
-	if err != nil {
-		msg = fmt.Sprintf("I caught an error: %v\n", err)
-	} else {
-		// >> Reddit Cake Day for $USER is: $CAKEDAY
-		msg = fmt.Sprintf("%v\n", responseString)
-	}
-	return msg
-}
-
-func HelpCmd() string {
-	return fmt.Sprintf("Available commands: !help, !ddg/search !weather (NYI), !cakeday, !VERB\n")
-}
-
-func WikiCmd(config *Config) string {
-	return fmt.Sprintf("(Channel Wiki)[ %s ]\n", config.WikiLink)
-}
-
-func HomePageCmd(config *Config) string {
-	return fmt.Sprintf("(Channel Homepage)[ %s ]\n", config.Homepage)
-}
-
-func ForumCmd(config *Config) string {
-	return fmt.Sprintf("(Channel Forums)[ %s ]\n", config.Forums)
 }
 
 // UrlTitle attempts to extract the title of the page that a
@@ -254,26 +156,6 @@ func UrlTitle(msg string) string {
 	return newMsg
 }
 
-// WebSearch takes a query string as an argument and returns
-// a formatted string containing the results from DuckDuckGo.
-func WebSearch(query string) string {
-	msg, err := goduckgo.Query(query)
-	if err != nil {
-		return fmt.Sprintf("DDG Error: %v\n", err)
-	}
-
-	switch {
-	case len(msg.RelatedTopics) > 0:
-		return fmt.Sprintf("First Topical Result: [ %s ]( %s )\n", msg.RelatedTopics[0].FirstURL, msg.RelatedTopics[0].Text)
-	case len(msg.Results) > 0:
-		return fmt.Sprintf("First External result: [ %s ]( %s )\n", msg.Results[0].FirstURL, msg.Results[0].Text)
-	case len(msg.Redirect) > 0:
-		return fmt.Sprintf("Redirect result: %s\n", UrlTitle(msg.Redirect))
-	default:
-		return fmt.Sprintf("Query: '%s' returned no results.\n", query)
-	}
-}
-
 // AddCallbacks is a single function that does what it says.
 // It's merely a way of decluttering the main function.
 func AddCallbacks(conn *irc.Connection, config *Config) {
@@ -298,7 +180,7 @@ func AddCallbacks(conn *irc.Connection, config *Config) {
 		go ChannelLogger(log, nick, message)
 	})
 	conn.AddCallback("QUIT", func(e *irc.Event) {
-		message := fmt.Sprintf("has quit (%s)", e.Message)
+		message := fmt.Sprintf("has quit (%v)", e.Message)
 		nick := fmt.Sprintf("%s@%s", e.Nick, e.Host)
 		go ChannelLogger(log, nick, message)
 	})
@@ -335,7 +217,7 @@ func Connect(conn *irc.Connection, config *Config) error {
 	for attempt := 1; attempt <= 3; attempt++ {
 		time.Sleep(delay * time.Second)
 		if err = conn.Connect(config.Server); err != nil {
-			fmt.Println("Connection attempt %v failed, trying again...", attempt)
+			fmt.Printf("Connection attempt %v failed, trying again...", attempt)
 		} else {
 			break
 		}
