@@ -8,10 +8,6 @@ import (
 
 // GenericVerbCmd returns a message string based on the supplied cmd (a verb).
 func GenericVerbCmd(cmd, extra string) string {
-	// This should give us something like:
-	//     "Snuffles slaps $USER, FOR SCIENCE!"
-	// If given the command:
-	//     "!slap $USER"
 	randQuip := RandomQuip()
 	return fmt.Sprintf("\x01"+"ACTION %v %v, %v\x01", cmd, extra, randQuip)
 }
@@ -20,12 +16,11 @@ func GenericVerbCmd(cmd, extra string) string {
 // upon success, or an error string on failure.
 func CakeDayCmd(user string) string {
 	var msg string
-	// !cakeday $USER
+
 	responseString, err := cakeday.Get(user)
 	if err != nil {
 		msg = fmt.Sprintf("I caught an error: %v\n", err)
 	} else {
-		// >> Reddit Cake Day for $USER is: $CAKEDAY
 		msg = fmt.Sprintf("%v\n", responseString)
 	}
 	return msg
