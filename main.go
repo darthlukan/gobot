@@ -189,7 +189,6 @@ func AddCallbacks(conn *irc.Connection, config *Config) {
 		var response string
 		message := e.Message()
 		if strings.Contains(message, config.Trigger) && strings.Index(message, config.Trigger) == 0 {
-			// This is a command, parse it.
 			response = ParseCmds(message, config)
 		}
 		if strings.Contains(message, "http://") || strings.Contains(message, "https://") || strings.Contains(message, "www.") {
@@ -228,7 +227,6 @@ func Connect(conn *irc.Connection, config *Config) error {
 func main() {
 
 	rand.Seed(64)
-	// Read the config file and populate our Config struct.
 	file, err := os.Open("config.json")
 
 	if err != nil {
@@ -246,7 +244,6 @@ func main() {
 
 	if err != nil {
 		fmt.Println("Failed to connect.")
-		// Without a connection, we're useless, panic and die.
 		panic(err)
 	}
 
