@@ -61,7 +61,7 @@ of an semi-clever assistant.
     !cakeday darthlukan
 ```
 
-* !<VERB>: Echo the <VERB> and add a random quip. 
+* !VERB: Echo the VERB and add a random quip. 
 
 ```
     !slap SomeUser really hard
