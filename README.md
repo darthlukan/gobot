@@ -7,7 +7,8 @@ GoBot
 
 ## Description
 
-> GoBot is my first stab at an IRC bot written in Go.
+> GoBot is my first stab at an IRC bot written in Go. The goal is for it to become less of a "dumb bot" and more
+of an semi-clever assistant.
 
 ## Installation
 
@@ -37,9 +38,31 @@ GoBot
 
 ## in-channel interaction
 
-> For now, there aren't really any "real" commands, but if you prefix with "!", the bot will spit out a message.
+> For now, the available commands are fairly limited, here's what's available:
 
-> Example:
+* !search or !ddg: Execute a search via DuckDuckGo
+
+```
+    !search Los Angeles
+    !ddg New York
+```
+
+> !bangs support has also been included, so you can get results from Google as well as many other sources:
+
+```
+    !search !google weather in Los Angeles
+    !search !archwiki i3
+    !ddg !godoc cakeday
+```
+
+* !cakeday: Find the Reddit cakeday for a user
+
+```
+    !cakeday darthlukan
+```
+
+* !<VERB>: Echo the <VERB> and add a random quip. 
+
 ```
     !slap SomeUser really hard
     >> *$botNick slaps SomeUser really hard, FOR SCIENCE!
@@ -56,7 +79,7 @@ GoBot
 
 - 1. Add commands that actually do something useful
 - 2. ~~DuckDuckGo Search~~
-- 3. ~~~Logging~~~
+- 3. ~~Logging~~
 - 4. Tests would be nice >.>
 
 ## License
