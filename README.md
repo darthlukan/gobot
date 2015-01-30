@@ -80,7 +80,7 @@ of an semi-clever assistant.
 - 1. Add commands that actually do something useful
 - 2. ~~DuckDuckGo Search~~
 - 3. ~~Logging~~
-- 4. Tests would be nice >.>
+- 4. ~~Tests would be nice >.>~~
 
 ## License
 
