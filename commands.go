@@ -3,7 +3,10 @@ package main
 import (
 	"fmt"
 	"github.com/darthlukan/cakeday"
+	"github.com/darthlukan/goconvtemps"
 	"github.com/darthlukan/goduckgo/goduckgo"
+	"strconv"
+	"strings"
 )
 
 // GenericVerbCmd returns a message string based on the supplied cmd (a verb).
@@ -46,8 +49,34 @@ func SearchCmd(query string) string {
 	}
 }
 
+func ConvertTempsCmd(query string) string {
+	var unit string
+	var converted string
+
+	input := strings.ToLower(query)
+
+	if strings.Index(input, "c") != -1 {
+		unit = "c"
+	} else if strings.Index(input, "f") != -1 {
+		unit = "f"
+	} else {
+		return fmt.Sprintf("Invalid unit input, please use either 'F' or 'C'.\n")
+	}
+
+	temp, err := strconv.ParseFloat(fmt.Sprintf("%v", string(strings.Split(input, unit)[0])), 64)
+
+	if err != nil {
+		return fmt.Sprintf("Caught error '%v' trying to convert '%v'.\n", err, query)
+	}
+
+	converted = goconvtemps.ConvertTemps(temp, unit)
+
+	return fmt.Sprintf("%v is %v.\n", strings.ToUpper(input), converted)
+}
+
 func WeatherCmd(query string) string {
-    // YQL stuff here
+	// Cheezy workaround until YQL lib is complete
+	return fmt.Sprintf("!ddg !google %v\n", query)
 }
 
 func HelpCmd() string {
