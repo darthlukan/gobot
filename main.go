@@ -87,6 +87,9 @@ func ParseCmds(cmdMsg string, config *Config) string {
 		case strings.Contains(cmd, "ddg"), strings.Contains(cmd, "search"):
 			query := strings.Join(msgArray[1:], " ")
 			msg = SearchCmd(query)
+		case strings.Contains(cmd, "weather"):
+			query := strings.Join(msgArray[1:], " ")
+			msg := WeatherCmd(query)
 		default:
 			msg = GenericVerbCmd(cmd, msgArray[1])
 		}

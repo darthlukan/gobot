@@ -46,6 +46,10 @@ func SearchCmd(query string) string {
 	}
 }
 
+func WeatherCmd(query string) string {
+    // YQL stuff here
+}
+
 func HelpCmd() string {
 	return fmt.Sprintf("Available commands: !help, !ddg/search !weather (NYI), !cakeday, !VERB\n")
 }
