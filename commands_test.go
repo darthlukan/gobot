@@ -67,3 +67,10 @@ func TestSearchCmd(t *testing.T) {
 		t.Errorf("SearchCmd(%v), got %v, want 'Query: my face returned no results.'\n", "your face", noResult)
 	}
 }
+
+func TestConvertTempCmd(t *testing.T) {
+	result := ConvertTempCmd("-40F")
+	if !strings.Contains(result, "-40C") {
+		t.Errorf("ConvertTemps('-40F'), got %v, want '-40F is -40C'.\n", result)
+	}
+}

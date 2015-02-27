@@ -76,11 +76,11 @@ func ConvertTempCmd(query string) string {
 
 func WeatherCmd(query string) string {
 	// Cheezy workaround until YQL lib is complete
-	return fmt.Sprintf("!ddg !google %v\n", query)
+	return fmt.Sprintf("Try '!search !google %v'\n", query)
 }
 
 func HelpCmd() string {
-	return fmt.Sprintf("Available commands: !help, !ddg/search !weather (NYI), !cakeday, !VERB\n")
+	return fmt.Sprintf("Available commands: !help, !ddg/search !weather, !convtemp, !cakeday, !VERB\n")
 }
 
 func WikiCmd(config *Config) string {
