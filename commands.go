@@ -49,7 +49,7 @@ func SearchCmd(query string) string {
 	}
 }
 
-func ConvertTempsCmd(query string) string {
+func ConvertTempCmd(query string) string {
 	var unit string
 	var converted string
 
