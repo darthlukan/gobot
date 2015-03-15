@@ -39,7 +39,17 @@ import (
 const delay = 40
 
 type Config struct {
-	Server, Channel, BotUser, BotNick, Trigger, WeatherKey, LogDir, WikiLink, Homepage, Forums string
+	Admins     []string
+	Server     string
+	Channel    string
+	BotUser    string
+	BotNick    string
+	Trigger    string
+	WeatherKey string
+	LogDir     string
+	WikiLink   string
+	Homepage   string
+	Forums     string
 }
 
 var quips = []string{
@@ -57,6 +67,7 @@ var quips = []string{
 	"really???",
 	"LLLLEEEEEERRRRRROOOOYYYY JEEEENNNKINNNS!",
 	"DOH!",
+	"Giggity!",
 }
 
 func RandomQuip() string {
@@ -87,9 +98,6 @@ func ParseCmds(cmdMsg string, config *Config) string {
 		case strings.Contains(cmd, "ddg"), strings.Contains(cmd, "search"):
 			query := strings.Join(msgArray[1:], " ")
 			msg = SearchCmd(query)
-		case strings.Contains(cmd, "weather"):
-			query := strings.Join(msgArray[1:], " ")
-			msg = WeatherCmd(query)
 		case strings.Contains(cmd, "convtemp"):
 			query := strings.Join(msgArray[1:], " ")
 			msg = ConvertTempCmd(query)
@@ -99,7 +107,7 @@ func ParseCmds(cmdMsg string, config *Config) string {
 	} else {
 		switch {
 		case strings.Contains(msgArray[0], "help"):
-			msg = HelpCmd()
+			msg = HelpCmd(config.Trigger)
 		case strings.Contains(msgArray[0], "wiki"):
 			msg = WikiCmd(config)
 		case strings.Contains(msgArray[0], "homepage"):
@@ -107,7 +115,7 @@ func ParseCmds(cmdMsg string, config *Config) string {
 		case strings.Contains(msgArray[0], "forums"):
 			msg = ForumCmd(config)
 		default:
-			msg = "I get it, you're just a human.  Try '!help ', and don't forget the space!"
+			msg = "I get it, you're just a human.  Try '!help'"
 		}
 	}
 	return msg
@@ -199,6 +207,10 @@ func AddCallbacks(conn *irc.Connection, config *Config) {
 		}
 		if strings.Contains(message, "http://") || strings.Contains(message, "https://") || strings.Contains(message, "www.") {
 			response = UrlTitle(message)
+		}
+
+		if strings.Contains(message, "quit") {
+			QuitCmd(config.Admins, e.Nick)
 		}
 
 		if len(response) > 0 {
