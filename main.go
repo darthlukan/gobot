@@ -114,7 +114,7 @@ func ParseCmds(cmdMsg string, config *Config) string {
 		case strings.Contains(msgArray[0], "forums"):
 			msg = ForumCmd(config)
 		default:
-			msg = "I get it, you're just a human.  Try '!help'"
+			msg = ""
 		}
 	}
 	return msg
