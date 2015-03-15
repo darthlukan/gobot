@@ -208,7 +208,7 @@ func AddCallbacks(conn *irc.Connection, config *Config) {
 			response = UrlTitle(message)
 		}
 
-		if strings.Contains(message, "quit") {
+		if strings.Contains(message, fmt.Sprintf("%squit", config.Trigger)) {
 			QuitCmd(config.Admins, e.Nick)
 		}
 
