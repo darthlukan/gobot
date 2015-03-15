@@ -20,9 +20,9 @@ func TestCakeDayCmd(t *testing.T) {
 }
 
 func TestHelpCmd(t *testing.T) {
-	helpMsg := HelpCmd()
-	if !strings.Contains(helpMsg, "Available commands: !help, !ddg/search") {
-		t.Errorf("HelpCmd(), got %v, want 'Available commands: !help, !ddg/search'\n", helpMsg)
+	helpMsg := HelpCmd("!")
+	if !strings.Contains(helpMsg, "Commands: !help, !ddg/search") {
+		t.Errorf("HelpCmd(!), got %v, want 'Commands: !help, !ddg/search'\n", helpMsg)
 	}
 }
 

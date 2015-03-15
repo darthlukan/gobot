@@ -76,7 +76,8 @@ func ConvertTempCmd(query string) string {
 }
 
 func HelpCmd(trigger string) string {
-	return fmt.Sprintf("Commands: %shelp, %sddg/search, %sconvtemp, %scakeday, %sVERB. Admins only: %squit\n", trigger)
+	return fmt.Sprintf("Commands: %shelp, %sddg/search, %sconvtemp, %scakeday, %sVERB. Admins only: %squit\n",
+		trigger, trigger, trigger, trigger, trigger, trigger)
 }
 
 func WikiCmd(config *Config) string {
