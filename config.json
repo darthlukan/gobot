@@ -1,4 +1,5 @@
 {
+    "Admins": ["darthlukan"],
     "Server": "irc.freenode.net:6667",
     "Channel": "#evolveos",
     "BotUser": "Gobot",
