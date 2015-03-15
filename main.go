@@ -33,7 +33,6 @@ import (
 	"os"
 	"regexp"
 	"strings"
-	"time"
 )
 
 const delay = 40
@@ -225,23 +224,6 @@ func AddCallbacks(conn *irc.Connection, config *Config) {
 	})
 }
 
-// Connect tries up to three times to get a connection to the server
-// and channel, hopefully with a nil err value at some point.
-// Returns error
-func Connect(conn *irc.Connection, config *Config) error {
-	var err error
-
-	for attempt := 1; attempt <= 3; attempt++ {
-		time.Sleep(delay * time.Second)
-		if err = conn.Connect(config.Server); err != nil {
-			fmt.Printf("Connection attempt %v failed, trying again...", attempt)
-		} else {
-			break
-		}
-	}
-	return err
-}
-
 func main() {
 
 	rand.Seed(64)
@@ -258,7 +240,7 @@ func main() {
 	decoder.Decode(&config)
 
 	conn := irc.IRC(config.BotNick, config.BotUser)
-	err = Connect(conn, config)
+	err = conn.Connect(config.Server)
 
 	if err != nil {
 		fmt.Println("Failed to connect.")
