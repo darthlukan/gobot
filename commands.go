@@ -5,6 +5,7 @@ import (
 	"github.com/darthlukan/cakeday"
 	"github.com/darthlukan/goconvtemps"
 	"github.com/darthlukan/goduckgo/goduckgo"
+	"os"
 	"strconv"
 	"strings"
 )
@@ -74,13 +75,8 @@ func ConvertTempCmd(query string) string {
 	return fmt.Sprintf("%v is %v.\n", strings.ToUpper(input), converted)
 }
 
-func WeatherCmd(query string) string {
-	// Cheezy workaround until YQL lib is complete
-	return fmt.Sprintf("Try '!search !google %v'\n", query)
-}
-
-func HelpCmd() string {
-	return fmt.Sprintf("Available commands: !help, !ddg/search !weather, !convtemp, !cakeday, !VERB\n")
+func HelpCmd(trigger string) string {
+	return fmt.Sprintf("Commands: %shelp, %sddg/search, %sconvtemp, %scakeday, %sVERB. Admins only: %squit\n", trigger)
 }
 
 func WikiCmd(config *Config) string {
@@ -93,4 +89,12 @@ func HomePageCmd(config *Config) string {
 
 func ForumCmd(config *Config) string {
 	return fmt.Sprintf("(Channel Forums)[ %s ]\n", config.Forums)
+}
+
+func QuitCmd(admins []string, user string) {
+	for _, admin := range admins {
+		if user == admin {
+			os.Exit(0)
+		}
+	}
 }
