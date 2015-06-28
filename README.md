@@ -5,6 +5,18 @@ GoBot
 [![Build Status](https://travis-ci.org/darthlukan/gobot.svg?branch=master)](https://travis-ci.org/darthlukan/gobot)
 
 
+## IMPORTANT!
+
+> Development of GoBot has moved to [TheSetKehProject](https://github.com/thesetkehproject/) under the
+> [Ana](https://github.com/thesetkehproject/ana) repository. There will be no more updates to this repository but it
+> will be kept here so that users of this original project can still benefit from its use. For those users that still
+> wish to contribute to GoBot as a learning tool or simply to get into contributing to open source projects, I will
+> review and merge pull requests that do not cause build breakage and where new code makes sense.
+
+> For users seeking more than "just an IRC bot" to use and/or contribute to, please refer to the
+> [Ana](https://github.com/thesetkehproject/ana) repository.
+
+
 ## Description
 
 > GoBot is my first stab at an IRC bot written in Go. The goal is for it to become less of a "dumb bot" and more
@@ -75,12 +87,6 @@ of an semi-clever assistant.
 
 > NOTE: the Directory Must be Writable by the user executing the bot.
 
-## TODO
-
-- 1. Add commands that actually do something useful
-- 2. ~~DuckDuckGo Search~~
-- 3. ~~Logging~~
-- 4. ~~Tests would be nice >.>~~
 
 ## License
 
